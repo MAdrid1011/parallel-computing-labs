@@ -2230,13 +2230,20 @@
 <div class="admonition tip">
 <p class="admonition-title">切换编译器后如何重新构建？</p>
 <p>CMake 会记住第一次配置时选用的编译器。如果原来的 <code>build/</code> 使用了另一个编译器，可以保留它，改用一个新的构建目录，例如 <code>build-llvm/</code>。此时后续运行可执行文件也要使用新目录中的路径。</p>
+<p>测量脚本也需要选择这个目录，否则无法确认是否运行了新程序。以 Lab1 为例：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-llvm<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build-llvm<span class="w"> </span>--parallel<span class="w"> </span><span class="m">4</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--build-dir<span class="w"> </span>build-llvm<span class="w"> </span>--m<span class="w"> </span><span class="m">256</span><span class="w"> </span>--k<span class="w"> </span><span class="m">512</span><span class="w"> </span>--n<span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span>--nnz-per-row<span class="w"> </span><span class="m">8</span><span class="w"> </span>--repeat<span class="w"> </span><span class="m">1</span><span class="w"> </span>--rounds<span class="w"> </span><span class="m">1</span><span class="w"> </span>--verify<span class="w"> </span>--output<span class="w"> </span>results/quick_llvm
+</code></pre></div>
+<p><code>--build-dir</code> 适用于 Lab1～Lab4，<code>environment.json</code> 会记录实际目录与编译器。</p>
 <p>也可以仅删除当前实验生成的 <code>build/</code> 后重新配置；源码位于 <code>src/</code> 和 <code>include/</code>，Lab5 的 RTL 位于 <code>rtl/</code>。</p>
 </div>
 <h2 id="python">Python 虚拟环境<a class="headerlink" href="#python" title="Permanent link">&para;</a></h2>
 <p>各实验都使用自己的 <code>.venv/</code>，用于安装 <code>requirements.txt</code> 中的 Python 依赖。在当前 Lab 目录执行：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </code></pre></div>
 <p>激活后，当前终端使用这个实验的 Python 环境。切换实验时，先执行 <code>deactivate</code>，再进入新 Lab 并激活它的 <code>.venv/</code>。再次打开终端时，不必重复创建环境，进入 Lab 后执行 <code>source .venv/bin/activate</code> 即可。</p>
 <h2 id="_2">接下来<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>

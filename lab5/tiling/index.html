@@ -2205,7 +2205,7 @@
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>双缓冲：加载 0 → 计算 0 ──────→ 计算 1 ──────→ ……
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>                 加载 1 ──────→ 加载 2 ──────→ ……
 </code></pre></div>
-<p>切换缓冲区时，下一块必须已经准备好。若加载更慢，仍需要等待；若加载能在当前计算期间完成，就有机会隐藏这部分等待。最后的输出写回也需要计入总周期。</p>
+<p>阵列开始使用下一缓冲之前，输入数据必须准备好。控制器可以先切换 <code>current_buffer</code>，再在 <code>WAIT_INPUT</code> 中等待其 <code>buffer_ready</code>；若加载能在当前计算期间完成，就有机会隐藏这部分等待。最后的输出写回也需要计入总周期。</p>
 <div class="admonition tip">
 <p class="admonition-title">比较双缓冲时固定其他条件</p>
 <p>固定矩阵、阵列、三维分块和 DRAM 参数，只切换 <code>single</code> 与 <code>double</code>。如果同时把块从 16 改成 64，就无法单独判断缓冲方式贡献了多少变化。</p>
@@ -2219,7 +2219,7 @@
 <p>满尺寸 P×P 微块处理一个长度为 TK 的 K 块时，阵列推进包含 TK 的供数以及 <code>2P−2</code> 的填充排空距离。查看代码怎样设置运行步数，再考虑不同尺寸下这部分开销的占比。</p>
 <p><code>overlap_cycles</code> 统计计算与输入 DMA 同时工作的周期，它是总周期中的一部分，不能与总周期相加。<code>overlap_read_beats</code> 帮助观察这段时间里实际接收了多少输入数据。</p>
 <h2 id="6">6. 动手试一试<a class="headerlink" href="#6" title="Permanent link">&para;</a></h2>
-<p>按<a href="../run/">操作步骤</a>构建后执行默认运行，先固定阵列边长，在不同 tile 下比较单、双缓冲。</p>
+<p>按<a href="../run/">操作步骤</a>构建后先执行快速验证，再运行完整测量，先固定阵列边长，在不同 tile 下比较单、双缓冲。</p>
 <h3 id="dram">改变 DRAM 延迟<a class="headerlink" href="#dram" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">for</span><span class="w"> </span>latency<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">12</span><span class="w"> </span><span class="m">24</span><span class="w"> </span><span class="m">48</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span>python3<span class="w"> </span>run.py<span class="w"> </span>--m<span class="w"> </span><span class="m">256</span><span class="w"> </span>--array<span class="w"> </span><span class="m">8</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="m">32</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="se">\</span>
@@ -2236,8 +2236,80 @@
 </code></pre></div>
 <p>这一参数改变连续数据拍之间的最小间隔。比较它与首拍延迟，想一想两者分别影响了突发传输的哪一部分。</p>
 <h3 id="_3">对照波形与阶段<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>按操作页的命令保存 VCD，使用 GTKWave 等工具打开。先找到 <code>compute_active</code> 与读数据握手，再找到 <code>current_buffer</code>、<code>buffer_ready</code>，观察加载和计算是否在同一段时间进行。</p>
-<p>波形只保存参数指定的周期窗口。当前窗口没有覆盖某次缓冲切换时，调整 <code>--trace-start</code> 和 <code>--trace-cycles</code>，保持矩阵配置不变。</p>
+<p>先生成一个易观察的小配置，固定握手停顿为 0，让两次运行更容易对照：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--m<span class="w"> </span><span class="m">32</span><span class="w"> </span>--k<span class="w"> </span><span class="m">64</span><span class="w"> </span>--n<span class="w"> </span><span class="m">32</span><span class="w"> </span>--array<span class="w"> </span><span class="m">8</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">16</span><span class="w"> </span>--buffering<span class="w"> </span>double<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span>--stall-percent<span class="w"> </span><span class="m">0</span><span class="w"> </span>--verify<span class="w"> </span>--trace<span class="w"> </span>results/buffering.vcd<span class="w"> </span>--trace-cycles<span class="w"> </span><span class="m">4096</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span>--output<span class="w"> </span>results/buffering
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>python3<span class="w"> </span>plot_waveform.py<span class="w"> </span>--input<span class="w"> </span>results/buffering.vcd<span class="w"> </span>--output<span class="w"> </span>results/buffering.png
+</code></pre></div>
+<p>先打开生成的 PNG，就能查看关键波形；Windows 的 WSL2 和 macOS 都使用已有的 Python 环境，无需另装查看器。横轴是仿真周期，包含复位阶段。脚本默认选择第一次计算附近的 1200 个周期；可用 <code>--start 500 --cycles 1500</code> 改变观察窗口。</p>
+<p><a href="../../assets/lab5-buffering-waveform.png"><img alt="双缓冲参考波形：计算、读数据握手与缓冲切换" src="../../assets/lab5-buffering-waveform.png" /></a></p>
+<p>点击参考图可查看原图。</p>
+<p>这张图来自上面的 32×64×32、8×8 阵列、tile=16 配置。先在 <code>compute_active=1</code> 的区间查看 <code>r_valid &amp; r_ready=1</code> 的数据拍，确认加载与计算发生重叠；再沿虚线找到 <code>current_buffer</code> 的切换，对照下一缓冲的 <code>buffer_ready</code>。下一缓冲尚未就绪时，计算仍需要等待。</p>
+<p>如果使用 GTKWave 等交互式查看器，按以下步骤查看完整 VCD：</p>
+<ol>
+<li>在 Ubuntu 中可执行 <code>sudo apt install gtkwave</code>，然后 <code>gtkwave results/buffering.vcd</code>；已有查看器的 macOS 同学也可以直接打开此文件。</li>
+<li>在层级树中展开 <code>TOP → matrix_accelerator</code>。选择 <code>clk</code>、<code>state</code>、<code>compute_active</code>、<code>current_buffer</code>、<code>buffer_ready</code>、<code>ar_valid/ready</code>、<code>r_valid/ready</code>，添加到波形列表。</li>
+<li>先缩放到完整时间范围，找到第一次 <code>compute_active=1</code>，再框选它与首次缓冲切换附近的区间放大。</li>
+<li>对多位 <code>state</code> 使用十进制显示，按下表识别阶段；若窗口未包含切换，增大 <code>--trace-cycles</code> 或调整 <code>--trace-start</code> 后重新生成。</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>state 值</th>
+<th>阶段</th>
+<th>可以观察什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 · IDLE</td>
+<td>空闲</td>
+<td>等待 start</td>
+</tr>
+<tr>
+<td>1 · TILE_INIT</td>
+<td>初始化输出块</td>
+<td>准备分块与读 DMA</td>
+</tr>
+<tr>
+<td>2 · ZERO_C</td>
+<td>清零 C 的 SPM</td>
+<td>为跨 K 累加准备空间</td>
+</tr>
+<tr>
+<td>3 · WAIT_INPUT</td>
+<td>等待输入</td>
+<td>检查当前 buffer_ready</td>
+</tr>
+<tr>
+<td>4 · CLEAR_PE</td>
+<td>清零阵列部分和</td>
+<td>准备下一个微块</td>
+</tr>
+<tr>
+<td>5 · RUN_PE</td>
+<td>推进阵列</td>
+<td>compute_active=1，观察并行的读握手</td>
+</tr>
+<tr>
+<td>6 · STORE_C</td>
+<td>保存本次部分和</td>
+<td>累加到 C 的 SPM</td>
+</tr>
+<tr>
+<td>7 · WRITE_START</td>
+<td>启动写 DMA</td>
+<td>开始输出回写</td>
+</tr>
+<tr>
+<td>8 · WAIT_OUTPUT</td>
+<td>等待输出完成</td>
+<td>aw/w 握手与最后写响应</td>
+</tr>
+</tbody>
+</table>
+<p>VCD 中每个时钟周期有两个时间 tick；课程脚本换算成周期，并在上升沿之前采样握手。VCD 的 <code>1ps</code> 时间单位是仿真表示，不能据此推断真实芯片频率。</p>
 <details class="info">
 <summary>为什么不能用 host_seconds 判断阵列加速？</summary>
 <p>较大的 RTL 模型需要仿真器处理更多逻辑，同一个硬件周期可能花更多宿主机时间。<code>host_seconds</code> 反映仿真开销，<code>cycles</code> 反映当前设计完成任务的周期数。除非另有时钟频率和实现数据，不能把周期直接当成真实芯片的毫秒或主频性能。</p>

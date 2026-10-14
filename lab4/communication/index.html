@@ -2165,7 +2165,7 @@
 <p><code>banded</code> 将第 i 行的非零列集中在 <code>i × K / M</code> 附近。结合连续行段划分，某些引用可能落在本地 B 区间附近。实际需要的远程行集合，请通过程序的统计观察。</p>
 <p><code>blocked</code> 表示每 32 行共享紧凑列窗口，窗口由输入生成规则决定。不要仅根据名称就认定它一定引用本地 B。</p>
 <h2 id="5">5. 动手试一试<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
-<p>按<a href="../run/">操作步骤</a>构建并执行默认配置。先固定规模和进程数，在不同 profile 下比较 Broadcast、Allgather、Halo 和 Overlap。</p>
+<p>按<a href="../run/">操作步骤</a>构建并通过快速验证后，运行完整测量。先固定规模和进程数，在不同 profile 下比较 Broadcast、Allgather、Halo 和 Overlap。</p>
 <h3 id="_2">看通信量<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <p>在 <code>communication_volume.csv</code> 中查看 <code>received_mib</code>。在 <code>raw.csv</code> 的进程记录中查看 <code>local_nnz</code>、<code>remote_nnz</code>、<code>send_bytes</code>、<code>receive_bytes</code>。</p>
 <p>尝试回答：哪些输入让进程需要更多远程行？哪些实现接收了本地计算不需要的行？同样的非零数，为什么通信量可以不同？</p>

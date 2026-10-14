@@ -2125,7 +2125,7 @@
 <li><code>src/transpose_tiled.cpp</code>：找到二维块循环、边界截断和线程统计。</li>
 </ol>
 <h2 id="6">6. 动手试一试<a class="headerlink" href="#6" title="Permanent link">&para;</a></h2>
-<p>按<a href="../run/">操作步骤</a>构建后执行默认运行。固定一个 N 和线程数，比较 Naive 与不同 tile 的时间；再固定 tile，看它在不同 N 下的表现。</p>
+<p>按<a href="../run/">操作步骤</a>构建后先执行快速验证，再运行完整测量。固定一个 N 和线程数，比较 Naive 与不同 tile 的时间；再固定 tile，看它在不同 N 下的表现。</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">4096</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="m">32</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="m">128</span><span class="w"> </span>--output<span class="w"> </span>results/n4096
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">2048</span><span class="w"> </span><span class="m">3072</span><span class="w"> </span><span class="m">4096</span><span class="w"> </span><span class="m">6144</span><span class="w"> </span><span class="m">8192</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">64</span><span class="w"> </span>--output<span class="w"> </span>results/tile64

@@ -2198,7 +2198,7 @@
 <p>这种方法多用了计数空间，也增加了合并工作。随着线程数和桶数变化，两者的代价也会变化。实际工作空间还带有填充，阅读 <code>include/histogram.hpp</code> 和 <code>src/workspace.cpp</code> 时可以找到布局。</p>
 <p>在 <code>src/histogram_private.cpp</code> 中依次找到：线程编号、私有计数入口、输入循环、计数后的屏障，以及合并循环。</p>
 <h2 id="6">6. 动手试一试<a class="headerlink" href="#6" title="Permanent link">&para;</a></h2>
-<p>按<a href="../run/">操作步骤</a>构建并运行默认配置，固定输入规模、桶数和线程数，比较不同更新方式。</p>
+<p>按<a href="../run/">操作步骤</a>构建并通过快速验证后，运行完整测量，固定输入规模、桶数和线程数，比较不同更新方式。</p>
 <h3 id="_2">比较不同锁数<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">10000000</span><span class="w"> </span>--stripes<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="m">256</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>--output<span class="w"> </span>results/lock_counts

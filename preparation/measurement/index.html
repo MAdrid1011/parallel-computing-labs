@@ -680,7 +680,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        为什么会运行多次？
+        先验证，再测量
       
     </span>
   </a>
@@ -691,7 +691,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        加速比的分母是谁？
+        为什么会运行多次？
       
     </span>
   </a>
@@ -702,7 +702,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        计时范围也需要看
+        加速比的分母是谁？
       
     </span>
   </a>
@@ -713,7 +713,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        从哪个文件开始看？
+        计时范围也需要看
       
     </span>
   </a>
@@ -724,7 +724,29 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
+        从哪个文件开始看？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
         为自己留下一份记录
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        保存一组实验结论
       
     </span>
   </a>
@@ -2002,7 +2024,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        为什么会运行多次？
+        先验证，再测量
       
     </span>
   </a>
@@ -2013,7 +2035,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        加速比的分母是谁？
+        为什么会运行多次？
       
     </span>
   </a>
@@ -2024,7 +2046,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        计时范围也需要看
+        加速比的分母是谁？
       
     </span>
   </a>
@@ -2035,7 +2057,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        从哪个文件开始看？
+        计时范围也需要看
       
     </span>
   </a>
@@ -2046,7 +2068,29 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
+        从哪个文件开始看？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
         为自己留下一份记录
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        保存一组实验结论
       
     </span>
   </a>
@@ -2082,13 +2126,19 @@
 <p class="admonition-title">结果取决于你的运行环境</p>
 <p>CPU、内存、编译器以及后台程序都会影响时间。请记录自己的环境，并在同一台电脑上完成一组比较。运行时尽量保持电源状态一致，避免同时执行其他耗时任务。</p>
 </div>
-<h2 id="_3">为什么会运行多次？<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h2 id="_3">先验证，再测量<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>每个实验都支持 <code>--verify</code>。先运行操作页的小规模验证：Lab1 与 Lab4 逐元素对比串行稀疏乘法参考，Lab2 检查转置坐标，Lab3 逐桶对比串行计数，Lab5 对比软件整数矩阵乘法。验证发生在核心计时之外，失败会指出位置并停止。</p>
+<p>浮点结果允许 <code>1e-10 + 1e-9 × |参考值|</code> 的绝对误差，整数结果要求完全相同。修改 C++ 或 RTL 后，重新构建并验证，再运行正式测量；验证会影响运行间的数据访问，因此正式性能比较建议在单独的小规模验证后运行。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>VERIFY PASS: ...           → 当前输出通过完整比较
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>VERIFY FAIL at (...) ...   → 查看错误坐标、期望值与实际值
+</code></pre></div>
+<h2 id="_4">为什么会运行多次？<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>一次时间可能受到操作系统调度、缓存状态和后台活动影响。Lab1～Lab4 默认先预热，再重复测量，并用中位数汇总。<code>raw.csv</code> 保存逐次记录，<code>summary.csv</code> 保存整理后的数据。</p>
 <p>中位数可以减轻个别异常值的影响，但不能消除系统持续受到的干扰。如果多次时间波动很大，先查看原始记录和运行环境，再解释实现之间的差别。</p>
 <p>Lab5 默认每个配置仿真一次。它主要比较硬件周期；增加 <code>--repeat</code> 后，会按文档改变握手停顿的种子，并选取中位周期对应的记录。</p>
-<h2 id="_4">加速比的分母是谁？<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_5">加速比的分母是谁？<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <p>加速比定义为：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>加速比 = 基准配置的时间 / 当前配置的时间
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>加速比 = 基准配置的时间 / 当前配置的时间
 </code></pre></div>
 <p>例如，在一个说明公式的假设中，基准用时 120 ms，当前配置用时 60 ms，加速比就是 2。这只是公式示例，请使用自己测量的数值。</p>
 <table>
@@ -2128,10 +2178,10 @@
 </tbody>
 </table>
 <p>Lab1 的 <code>speedup</code> 与 <code>thread_speedup</code> 使用不同的基准；Lab4 的 <code>speedup</code> 与 <code>process_speedup</code> 也一样。Lab5 的 <code>speedup</code> 以 <code>baseline_*</code> 字段记录的配置为准。阅读数值时，请同时查看这些条件。</p>
-<h2 id="_5">计时范围也需要看<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_6">计时范围也需要看<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>Lab1～Lab3 的核心测量包含并行计算及相关调度和同步；输入生成等准备工作在计时之外。Lab4 的计时还包含 B 数据打包和通信，但交换计划准备和最终 checksum 汇总在计时之外。具体范围列在各实验操作页。</p>
 <p>Lab5 的 <code>cycles</code> 是仿真电路完成任务所用的周期，<code>host_seconds</code> 是电脑驱动仿真花的时间。两者回答不同的问题。比较加速器设计时，使用周期、传输字节数和有效乘加次数；估计自己需要等待多久时，可以看宿主机时间。</p>
-<h2 id="_6">从哪个文件开始看？<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_7">从哪个文件开始看？<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <p>先打开 <code>summary.csv</code>，确认当前行的规模、实现、并行度和分块参数，再看汇总时间或周期。需要观察各线程或各进程时，回到 <code>raw.csv</code>，按 <code>record</code> 区分记录类型。</p>
 <p>CSV 可以用文本编辑器、表格软件或 Python 阅读。整数统计通常描述“完成了多少工作”，时间描述“完成这些工作花了多久”。先把这两类信息对应起来，再讨论等待、通信或访存。</p>
 <details class="info">
@@ -2139,9 +2189,12 @@
 <p><code>checksum</code> 是输出元素的总和。它便于发现明显的异常，也能帮助核对同一组输入的运行记录。不同错误可能得到相同总和，因此单个 checksum 不能证明完整结果正确。</p>
 <p>阅读实现时仍应检查每个输出由谁更新、是否遗漏元素，以及共享更新是否正确同步。</p>
 </details>
-<h2 id="_7">为自己留下一份记录<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<h2 id="_8">为自己留下一份记录<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <p>建议至少保留：完整命令、<code>environment.json</code>、<code>summary.csv</code>、<code>raw.csv</code>，以及对应源码的版本。这样以后修改实现后，还能回到同一组条件重新比较。</p>
 <p><a class="md-button md-button--primary" href="../../lab1/">开始 Lab1</a></p>
+<h2 id="_9">保存一组实验结论<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
+<p>用一张表记录“实现、规模、并行度、分块、时间或周期、验证是否通过”。随后写清三个问题：改变了什么条件，数据出现了什么变化，哪些代码与统计支持你的解释。只观察到等待或加速比变化时，先保留原始记录，避免把单次波动当作结论。</p>
+<p>完整扫描可能持续数分钟甚至更久。进度中的 <code>i/total</code> 是程序启动次数，每次还会执行预热与多次测量。中断后 <code>raw.csv</code> 只包含已完成配置；最终 <code>summary.csv</code> 和图表需要全部扫描完成。重新运行使用新的输出目录，不自动从部分记录续跑。</p>
 
 
 

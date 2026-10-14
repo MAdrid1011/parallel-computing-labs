@@ -1128,7 +1128,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        构建与运行
+        构建
       
     </span>
   </a>
@@ -1139,7 +1139,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        设置运行参数
+        第一次运行：快速验证
       
     </span>
   </a>
@@ -1150,7 +1150,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        输入矩阵
+        完整测量
       
     </span>
   </a>
@@ -1161,7 +1161,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        单独运行一个实现
+        设置运行参数
       
     </span>
   </a>
@@ -1172,7 +1172,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        分组运行
+        参数范围与错误提示
       
     </span>
   </a>
@@ -1181,6 +1181,50 @@
       
         <li class="md-nav__item">
   <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        输入矩阵
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        单独运行一个实现
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        分组运行
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        怎样完成一组观察
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
     <span class="md-ellipsis">
       
         输出文件
@@ -2038,7 +2082,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        构建与运行
+        构建
       
     </span>
   </a>
@@ -2049,7 +2093,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        设置运行参数
+        第一次运行：快速验证
       
     </span>
   </a>
@@ -2060,7 +2104,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        输入矩阵
+        完整测量
       
     </span>
   </a>
@@ -2071,7 +2115,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        单独运行一个实现
+        设置运行参数
       
     </span>
   </a>
@@ -2082,7 +2126,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        分组运行
+        参数范围与错误提示
       
     </span>
   </a>
@@ -2091,6 +2135,50 @@
       
         <li class="md-nav__item">
   <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        输入矩阵
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        单独运行一个实现
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        分组运行
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        怎样完成一组观察
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
     <span class="md-ellipsis">
       
         输出文件
@@ -2135,14 +2223,18 @@
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    transpose.hpp              转置内核和线程统计
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    benchmark.hpp              运行参数
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    support.hpp                计时、随机数和 CSV 工具
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>  src/
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    main.cpp                   命令行参数
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    matrix.cpp                 输入矩阵生成
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    transpose_serial.cpp       串行转置
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    transpose_parallel.cpp     按行并行转置
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    transpose_tiled.cpp        分块并行转置
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    benchmark.cpp              预热、测量和 CSV 输出
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>  run.py                       顺序测量和汇总
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    validation.hpp             命令行值与范围检查
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    verification.hpp           参考结果核对接口
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>  src/
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    main.cpp                   命令行参数
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    matrix.cpp                 输入矩阵生成
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    transpose_serial.cpp       串行转置
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    transpose_parallel.cpp     按行并行转置
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    transpose_tiled.cpp        分块并行转置
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    benchmark.cpp              预热、测量和 CSV 输出
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    verification.cpp           逐元素或逐桶参考比较
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>  cli_utils.py                参数与构建目录检查
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>  run.py                       顺序测量和汇总
 </code></pre></div>
 <h2 id="_2">环境准备<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>进入 Lab2，后续命令都在这个文件夹内执行：</p>
@@ -2162,13 +2254,23 @@
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </code></pre></div>
-<h2 id="_3">构建与运行<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h2 id="_3">构建<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--parallel<span class="w"> </span><span class="m">4</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>python3<span class="w"> </span>run.py
 </code></pre></div>
-<p>默认扫描 N=2048、3072、4096、6144、8192 五组方阵。每组运行串行、按行并行，以及 tile=16、32、64、128 的分块转置，扫描 1、2、4 线程。编译产物保存在本实验的 <code>build/</code>，运行数据保存在本实验的 <code>results/</code>。</p>
-<h2 id="_4">设置运行参数<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_4">第一次运行：快速验证<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>先运行这组小配置，确认环境、程序和输出均正常：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">256</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="m">32</span><span class="w"> </span>--repeat<span class="w"> </span><span class="m">1</span><span class="w"> </span>--rounds<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>--verify<span class="w"> </span>--output<span class="w"> </span>results/quick
+</code></pre></div>
+<p>终端会显示 <code>Lab2 i/11</code> 的配置进度，并出现 <code>VERIFY PASS: 65536 elements</code>。PASS 后的误差或说明因实验而异。运行完成后，检查 <code>results/quick/environment.json</code>、<code>raw.csv</code>、<code>summary.csv</code> 和比较图表。</p>
+<p><code>--verify</code> 在计时之外逐元素或逐桶比较参考结果。错误会显示 <code>VERIFY FAIL</code>、第一个错误位置与期望值，并以非零退出码停止。浮点乘法使用 <code>1e-10 + 1e-9 × |参考值|</code> 的误差阈值；转置、计数和整数 GEMM 精确比较。<strong>小配置只确认功能，不能用于正式性能结论。</strong></p>
+<h2 id="_5">完整测量<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>确认快速验证通过后，再运行完整默认扫描：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python3<span class="w"> </span>run.py
+</code></pre></div>
+<p>完整默认扫描会启动 255 次独立程序；最大一组输入和输出矩阵合计约 512 MiB。先完成快速验证，完整扫描可能需要数分钟。默认扫描 N=2048、3072、4096、6144、8192 五组方阵。每组运行串行、按行并行，以及 tile=16、32、64、128 的分块转置，扫描 1、2、4 线程。编译产物保存在本实验的 <code>build/</code>，运行数据保存在本实验的 <code>results/</code>。</p>
+<h2 id="_6">设置运行参数<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>以下参数用于 <code>run.py</code>：</p>
 <table>
 <thead>
@@ -2214,16 +2316,35 @@
 <td><code>results/</code></td>
 <td>输出目录</td>
 </tr>
+<tr>
+<td><code>--verify</code></td>
+<td>关闭</td>
+<td>在计时之外逐元素或逐桶核对结果</td>
+</tr>
+<tr>
+<td><code>--build-dir</code></td>
+<td><code>build/</code></td>
+<td>选择构建目录；相对路径从本 Lab 目录解析</td>
+</tr>
 </tbody>
 </table>
 <p>指定全部主要参数：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">2048</span><span class="w"> </span><span class="m">3072</span><span class="w"> </span><span class="m">4096</span><span class="w"> </span><span class="m">6144</span><span class="w"> </span><span class="m">8192</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="m">32</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="m">128</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>--threads<span class="w"> </span><span class="m">4</span><span class="w"> </span>--repeat<span class="w"> </span><span class="m">7</span><span class="w"> </span>--rounds<span class="w"> </span><span class="m">3</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">2026</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">2048</span><span class="w"> </span><span class="m">3072</span><span class="w"> </span><span class="m">4096</span><span class="w"> </span><span class="m">6144</span><span class="w"> </span><span class="m">8192</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="m">32</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="m">128</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>--threads<span class="w"> </span><span class="m">4</span><span class="w"> </span>--repeat<span class="w"> </span><span class="m">7</span><span class="w"> </span>--rounds<span class="w"> </span><span class="m">3</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">2026</span>
 </code></pre></div>
-<p>修改 C++ 源码后，执行 <code>cmake --build build --parallel 4</code>，再运行 <code>python3 run.py</code>。</p>
-<h2 id="_5">输入矩阵<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>修改 C++ 源码后，先执行 <code>cmake --build build --parallel 4</code> 并重新运行快速验证，再进行正式测量。</p>
+<h2 id="_7">参数范围与错误提示<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p>N、tile、threads、repeat、rounds 必须为正整数；tile 可以大于 N，尾部自动截断。<code>seed</code> 为 0～4294967295。</p>
+<p>程序与脚本会拒绝未知参数、缺失参数值和非法配置，并给出明确原因。可执行文件和 <code>run.py</code> 均支持 <code>--help</code>。</p>
+<p>切换到新构建目录时，构建和测量必须选择同一个目录，例如：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-llvm<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build-llvm<span class="w"> </span>--parallel<span class="w"> </span><span class="m">4</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--build-dir<span class="w"> </span>build-llvm<span class="w"> </span>--help
+</code></pre></div>
+<p>实际测量时，把 <code>--build-dir build-llvm</code> 加到上面的快速验证命令或自己的参数组合中。<code>environment.json</code> 会记录实际构建目录与编译器。</p>
+<h2 id="_8">输入矩阵<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <p>输入和输出均为 N × N 的 <code>uint32_t</code> 方阵。输入由 <code>seed</code> 生成；相同 N 和 seed 下，各实现使用相同输入。矩阵元素按行存储，分块末尾的行列范围截断到 N。</p>
-<h2 id="_6">单独运行一个实现<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_9">单独运行一个实现<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
 <p>直接运行可执行文件，通过 <code>--kernel</code> 选择实现：</p>
 <table>
 <thead>
@@ -2252,24 +2373,51 @@
 </tbody>
 </table>
 <p>以下命令使用相同的矩阵参数，在 Bash 或 zsh 终端中执行：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">transpose_args</span><span class="o">=(</span>--n<span class="w"> </span><span class="m">2048</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">32</span><span class="w"> </span>--threads<span class="w"> </span><span class="m">4</span><span class="w"> </span>--repeat<span class="w"> </span><span class="m">7</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">2026</span><span class="o">)</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>./build/lab2_locality<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">transpose_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>serial
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>./build/lab2_locality<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">transpose_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>naive
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>./build/lab2_locality<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">transpose_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>tiled
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">transpose_args</span><span class="o">=(</span>--n<span class="w"> </span><span class="m">2048</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">32</span><span class="w"> </span>--threads<span class="w"> </span><span class="m">4</span><span class="w"> </span>--repeat<span class="w"> </span><span class="m">7</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">2026</span><span class="o">)</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>./build/lab2_locality<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">transpose_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>serial
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>./build/lab2_locality<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">transpose_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>naive
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>./build/lab2_locality<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">transpose_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>tiled
 </code></pre></div>
 <p>可执行文件向终端输出 CSV。保存到文件时，在命令末尾加上重定向：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>results/single
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>./build/lab2_locality<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">transpose_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>tiled<span class="w"> </span>&gt;<span class="w"> </span>results/single/tiled.csv
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>results/single
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>./build/lab2_locality<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">transpose_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>tiled<span class="w"> </span>&gt;<span class="w"> </span>results/single/tiled.csv
 </code></pre></div>
-<h2 id="_7">分组运行<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<h2 id="_10">分组运行<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
 <p>指定一组矩阵规模和多个分块边长：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">4096</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="m">32</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="m">128</span><span class="w"> </span>--output<span class="w"> </span>results/n4096
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">4096</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="m">32</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="m">128</span><span class="w"> </span>--output<span class="w"> </span>results/n4096
 </code></pre></div>
 <p>指定多组矩阵规模和一个分块边长：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">2048</span><span class="w"> </span><span class="m">4096</span><span class="w"> </span><span class="m">8192</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">64</span><span class="w"> </span>--output<span class="w"> </span>results/tile64
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">2048</span><span class="w"> </span><span class="m">4096</span><span class="w"> </span><span class="m">8192</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">64</span><span class="w"> </span>--output<span class="w"> </span>results/tile64
 </code></pre></div>
-<h2 id="_8">输出文件<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<h2 id="_11">怎样完成一组观察<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<p>每次固定输入与其他条件，只改变表中的一项。先核对正确性，再读取数据解释变化：</p>
+<table>
+<thead>
+<tr>
+<th>固定条件</th>
+<th>改变哪一项</th>
+<th>从哪里读数据</th>
+<th>要回答的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>N 和线程数固定</td>
+<td>Naive → Tile16 → Tile32 → Tile64</td>
+<td>median_ms、effective_gbps、updates</td>
+<td>为什么写入同样数量的元素，耗时仍不同？</td>
+</tr>
+<tr>
+<td>N、内核和 tile 固定</td>
+<td>threads=1、2、4</td>
+<td>thread_speedup 与原始多次时间</td>
+<td>增加线程的收益是否持续？</td>
+</tr>
+</tbody>
+</table>
+<p>为每组比较保留完整命令、环境文件、原始记录和汇总表；用一张对比表记录参数、耗时或周期，再写出“观察到什么、实现中哪一步能解释它”。性能趋势取决于机器与输入，不要求某个版本一定更快。</p>
+<h2 id="_12">输出文件<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
 <p><code>run.py</code> 默认将本次运行的数据保存到本实验的 <code>results/</code>，使用 <code>--output</code> 可以更改目录。</p>
 <table>
 <thead>
@@ -2302,6 +2450,7 @@
 </tbody>
 </table>
 <p>默认每次独立执行先预热一次，再测量七次并取中位数；进行三个批次后再取中位数。计时包含并行区域启动、循环调度和屏障；矩阵生成、B 清零、输出汇总和 checksum 计算在计时之外。</p>
+<p>终端的 <code>i/total</code> 统计独立配置启动次数，每次启动还包含自己的预热与重复测量。<code>raw.csv</code> 在每个配置完成后保存，<code>summary.csv</code> 和最终图表在全部配置完成后生成。按 Ctrl+C 中断会保留已完成的原始记录；部分数据不能视为完整扫描结果。再次运行请换一个 <code>--output</code> 目录；脚本会重新测量，不自动续跑。</p>
 <p>常用 CSV 字段：</p>
 <table>
 <thead>
@@ -2357,6 +2506,7 @@
 </tr>
 </tbody>
 </table>
+<p>如果实际线程数少于请求值，脚本会明确指出差异并停止汇总。检查 <code>OMP_THREAD_LIMIT</code> 等设置，或改用允许的 <code>--threads</code>；不要把实际两线程的记录当作四线程结果。</p>
 
 
 

@@ -2102,13 +2102,13 @@
 <p>对 Lab1～Lab4：</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--parallel<span class="w"> </span><span class="m">4</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>python3<span class="w"> </span>run.py
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--help
 </code></pre></div>
-<p>第一行让 CMake 读取当前目录 <code>.</code> 中的构建配置，把生成文件放到 <code>build/</code>。第二行编译源码。第三行运行当前实验的测量脚本。</p>
+<p>第一行让 CMake 读取当前目录 <code>.</code> 中的构建配置，把生成文件放到 <code>build/</code>。第二行编译源码。第三行查看当前实验的参数；随后按操作页的快速验证命令运行，确认环境与结果。</p>
 <p><code>--parallel 4</code> 指编译时最多并行执行四项构建工作。<strong>它不决定实验程序的线程数或 MPI 进程数</strong>；运行程序的并行度由 <code>--threads</code>、<code>--ranks</code> 或 <code>mpiexec -n</code> 设置。</p>
 <p>对 Lab5：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>build.py
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>python3<span class="w"> </span>run.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>build.py<span class="w"> </span>--array<span class="w"> </span><span class="m">8</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--m<span class="w"> </span><span class="m">32</span><span class="w"> </span>--array<span class="w"> </span><span class="m">8</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">16</span><span class="w"> </span>--verify<span class="w"> </span>--output<span class="w"> </span>results/quick
 </code></pre></div>
 <p>修改 C++ 或 RTL 后，重新构建，再运行程序。</p>
 <h2 id="_5">复制多行命令<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>

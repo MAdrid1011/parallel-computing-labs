@@ -1562,7 +1562,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        构建与运行
+        构建
       
     </span>
   </a>
@@ -1573,7 +1573,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        设置运行参数
+        第一次运行：快速验证
       
     </span>
   </a>
@@ -1584,7 +1584,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        输入分布
+        完整测量
       
     </span>
   </a>
@@ -1595,7 +1595,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        单独运行一个实现
+        设置运行参数
       
     </span>
   </a>
@@ -1606,7 +1606,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        分组运行
+        参数范围与错误提示
       
     </span>
   </a>
@@ -1615,6 +1615,50 @@
       
         <li class="md-nav__item">
   <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        输入分布
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        单独运行一个实现
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        分组运行
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        怎样完成一组观察
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
     <span class="md-ellipsis">
       
         输出文件
@@ -2038,7 +2082,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        构建与运行
+        构建
       
     </span>
   </a>
@@ -2049,7 +2093,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        设置运行参数
+        第一次运行：快速验证
       
     </span>
   </a>
@@ -2060,7 +2104,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        输入分布
+        完整测量
       
     </span>
   </a>
@@ -2071,7 +2115,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        单独运行一个实现
+        设置运行参数
       
     </span>
   </a>
@@ -2082,7 +2126,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        分组运行
+        参数范围与错误提示
       
     </span>
   </a>
@@ -2091,6 +2135,50 @@
       
         <li class="md-nav__item">
   <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        输入分布
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        单独运行一个实现
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        分组运行
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        怎样完成一组观察
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
     <span class="md-ellipsis">
       
         输出文件
@@ -2139,17 +2227,21 @@
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    spmm.hpp                  乘法接口和进程统计
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    benchmark.hpp             测量接口
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    support.hpp               随机数和 CSV 工具
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>  src/
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    main.cpp                  MPI 初始化和命令行参数
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    matrix.cpp                按全局索引生成本地矩阵
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    distribution.cpp          按行数或非零数划分 A
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    communication_plan.cpp    B 行去重、请求交换和列索引映射
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    spmm_tiled.cpp            行块、列块与 32 列微块
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    spmm_full.cpp             串行、完整 B 广播与收集
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    spmm_halo.cpp             所需 B 行的阻塞交换
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    spmm_overlap.cpp          所需 B 行的非阻塞交换和本地计算
-<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    benchmark.cpp             预热、测量和 CSV 输出
-<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>  run.py                      顺序测量和汇总
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    validation.hpp             命令行值与范围检查
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    verification.hpp           参考结果核对接口
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>  src/
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    main.cpp                  MPI 初始化和命令行参数
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    matrix.cpp                按全局索引生成本地矩阵
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    distribution.cpp          按行数或非零数划分 A
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    communication_plan.cpp    B 行去重、请求交换和列索引映射
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    spmm_tiled.cpp            行块、列块与 32 列微块
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    spmm_full.cpp             串行、完整 B 广播与收集
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    spmm_halo.cpp             所需 B 行的阻塞交换
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>    spmm_overlap.cpp          所需 B 行的非阻塞交换和本地计算
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>    benchmark.cpp             预热、测量和 CSV 输出
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>    verification.cpp           逐元素或逐桶参考比较
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>  cli_utils.py                参数与构建目录检查
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>  run.py                      顺序测量和汇总
 </code></pre></div>
 <h2 id="_2">环境准备<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>进入 Lab4，后续命令都在这个文件夹内执行：</p>
@@ -2167,13 +2259,23 @@
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </code></pre></div>
-<h2 id="_3">构建与运行<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h2 id="_3">构建<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--parallel<span class="w"> </span><span class="m">4</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>python3<span class="w"> </span>run.py
 </code></pre></div>
-<p>默认 M=4096、8192、16384，K=8192、N=1024，平均每行 32 个非零元素。运行四种输入分布和各个实现，扫描 1、2、4 进程。编译产物保存在本实验的 <code>build/</code>，运行数据保存在本实验的 <code>results/</code>。</p>
-<h2 id="_4">设置运行参数<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_4">第一次运行：快速验证<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>先运行这组小配置，确认环境、程序和输出均正常：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--m<span class="w"> </span><span class="m">128</span><span class="w"> </span>--k<span class="w"> </span><span class="m">256</span><span class="w"> </span>--n<span class="w"> </span><span class="m">64</span><span class="w"> </span>--nnz-per-row<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>--profile<span class="w"> </span>uniform<span class="w"> </span>banded<span class="w"> </span>--repeat<span class="w"> </span><span class="m">1</span><span class="w"> </span>--rounds<span class="w"> </span><span class="m">1</span><span class="w"> </span>--verify<span class="w"> </span>--output<span class="w"> </span>results/quick
+</code></pre></div>
+<p>终端会显示 <code>Lab4 i/28</code> 的配置进度，并出现 <code>VERIFY PASS: 8192 distributed elements</code>。PASS 后的误差或说明因实验而异。运行完成后，检查 <code>results/quick/environment.json</code>、<code>raw.csv</code>、<code>summary.csv</code> 和比较图表。</p>
+<p><code>--verify</code> 在计时之外逐元素或逐桶比较参考结果。错误会显示 <code>VERIFY FAIL</code>、第一个错误位置与期望值，并以非零退出码停止。浮点乘法使用 <code>1e-10 + 1e-9 × |参考值|</code> 的误差阈值；转置、计数和整数 GEMM 精确比较。<strong>小配置只确认功能，不能用于正式性能结论。</strong></p>
+<h2 id="_5">完整测量<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>确认快速验证通过后，再运行完整默认扫描：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python3<span class="w"> </span>run.py
+</code></pre></div>
+<p>完整默认扫描会启动 504 次 MPI 作业，进程启动与重复计算会让它耗时数分钟。默认 M=4096、8192、16384，K=8192、N=1024，平均每行 32 个非零元素。运行四种输入分布和各个实现，扫描 1、2、4 进程。编译产物保存在本实验的 <code>build/</code>，运行数据保存在本实验的 <code>results/</code>。</p>
+<h2 id="_6">设置运行参数<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>以下参数用于 <code>run.py</code>：</p>
 <table>
 <thead>
@@ -2254,16 +2356,35 @@
 <td>results/</td>
 <td>输出目录</td>
 </tr>
+<tr>
+<td><code>--verify</code></td>
+<td>关闭</td>
+<td>在计时之外逐元素或逐桶核对结果</td>
+</tr>
+<tr>
+<td><code>--build-dir</code></td>
+<td><code>build/</code></td>
+<td>选择构建目录；相对路径从本 Lab 目录解析</td>
+</tr>
 </tbody>
 </table>
 <p>指定矩阵参数和输入分布：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--m<span class="w"> </span><span class="m">4096</span><span class="w"> </span><span class="m">8192</span><span class="w"> </span><span class="m">16384</span><span class="w"> </span>--k<span class="w"> </span><span class="m">8192</span><span class="w"> </span>--n<span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>--nnz-per-row<span class="w"> </span><span class="m">32</span><span class="w"> </span>--ranks<span class="w"> </span><span class="m">4</span><span class="w"> </span>--partition<span class="w"> </span>nnz<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>--profile<span class="w"> </span>uniform<span class="w"> </span>skewed<span class="w"> </span>blocked<span class="w"> </span>banded<span class="w"> </span>--tile<span class="w"> </span><span class="m">128</span><span class="w"> </span>--block-nnz<span class="w"> </span><span class="m">256</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span>--repeat<span class="w"> </span><span class="m">7</span><span class="w"> </span>--rounds<span class="w"> </span><span class="m">3</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">2026</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--m<span class="w"> </span><span class="m">4096</span><span class="w"> </span><span class="m">8192</span><span class="w"> </span><span class="m">16384</span><span class="w"> </span>--k<span class="w"> </span><span class="m">8192</span><span class="w"> </span>--n<span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>--nnz-per-row<span class="w"> </span><span class="m">32</span><span class="w"> </span>--ranks<span class="w"> </span><span class="m">4</span><span class="w"> </span>--partition<span class="w"> </span>nnz<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>--profile<span class="w"> </span>uniform<span class="w"> </span>skewed<span class="w"> </span>blocked<span class="w"> </span>banded<span class="w"> </span>--tile<span class="w"> </span><span class="m">128</span><span class="w"> </span>--block-nnz<span class="w"> </span><span class="m">256</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>--repeat<span class="w"> </span><span class="m">7</span><span class="w"> </span>--rounds<span class="w"> </span><span class="m">3</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">2026</span>
 </code></pre></div>
-<p>修改 C++ 源码后，执行 <code>cmake --build build --parallel 4</code>，再运行 <code>python3 run.py</code>。</p>
-<h2 id="_5">输入分布<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>修改 C++ 源码后，先执行 <code>cmake --build build --parallel 4</code> 并重新运行快速验证，再进行正式测量。</p>
+<h2 id="_7">参数范围与错误提示<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p>维度、ranks、tile、block-nnz、repeat、rounds 必须为正整数。<code>nnz-per-row</code> 可为 0，但不能超过 K；<code>seed</code> 为 0～4294967295。直接运行 Serial 必须使用 1 个进程。K×N 不能超过 MPI 的 int 元素计数范围。</p>
+<p>程序与脚本会拒绝未知参数、缺失参数值和非法配置，并给出明确原因。可执行文件和 <code>run.py</code> 均支持 <code>--help</code>。</p>
+<p>切换到新构建目录时，构建和测量必须选择同一个目录，例如：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-llvm<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build-llvm<span class="w"> </span>--parallel<span class="w"> </span><span class="m">4</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--build-dir<span class="w"> </span>build-llvm<span class="w"> </span>--help
+</code></pre></div>
+<p>实际测量时，把 <code>--build-dir build-llvm</code> 加到上面的快速验证命令或自己的参数组合中。<code>environment.json</code> 会记录实际构建目录与编译器。</p>
+<h2 id="_8">输入分布<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <ul>
 <li><code>uniform</code>：各行非零数相同，列位置分散。</li>
 <li><code>skewed</code>：较多非零元素集中在前约 1/8 行。</li>
@@ -2272,7 +2393,7 @@
 </ul>
 <p>前三种输入沿用 Lab1 的生成方式。相同 M、K、N、平均非零数和 seed 下，A、B 的元素与 Lab1 相同。四种 profile 都保存 <code>M × nnz-per-row</code> 个非零元素。各进程按全局索引生成自己的数据。</p>
 <p><code>--partition rows</code> 按行数划分 A；<code>--partition nnz</code> 根据累计非零数划分连续行段，单行不拆分。B 始终按行数划分为连续区间。</p>
-<h2 id="_6">单独运行一个实现<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_9">单独运行一个实现<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -2310,42 +2431,69 @@
 </tbody>
 </table>
 <p>以下命令使用相同矩阵参数，在 Bash 或 zsh 终端中执行：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">spmm_args</span><span class="o">=(</span>--m<span class="w"> </span><span class="m">8192</span><span class="w"> </span>--k<span class="w"> </span><span class="m">8192</span><span class="w"> </span>--n<span class="w"> </span><span class="m">1024</span><span class="w"> </span>--nnz-per-row<span class="w"> </span><span class="m">32</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span>--profile<span class="w"> </span>banded<span class="w"> </span>--partition<span class="w"> </span>nnz<span class="w"> </span>--repeat<span class="w"> </span><span class="m">7</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">2026</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span>--block-nnz<span class="w"> </span><span class="m">256</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">128</span><span class="o">)</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>mpiexec<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>./build/lab4_spmm<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">spmm_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>serial
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>mpiexec<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>./build/lab4_spmm<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">spmm_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>broadcast
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>mpiexec<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>./build/lab4_spmm<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">spmm_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>allgather
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>mpiexec<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>./build/lab4_spmm<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">spmm_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>halo
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>mpiexec<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>./build/lab4_spmm<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">spmm_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>overlap
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">spmm_args</span><span class="o">=(</span>--m<span class="w"> </span><span class="m">8192</span><span class="w"> </span>--k<span class="w"> </span><span class="m">8192</span><span class="w"> </span>--n<span class="w"> </span><span class="m">1024</span><span class="w"> </span>--nnz-per-row<span class="w"> </span><span class="m">32</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span>--profile<span class="w"> </span>banded<span class="w"> </span>--partition<span class="w"> </span>nnz<span class="w"> </span>--repeat<span class="w"> </span><span class="m">7</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">2026</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span>--block-nnz<span class="w"> </span><span class="m">256</span><span class="w"> </span>--tile<span class="w"> </span><span class="m">128</span><span class="o">)</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>mpiexec<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>./build/lab4_spmm<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">spmm_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>serial
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>mpiexec<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>./build/lab4_spmm<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">spmm_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>broadcast
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>mpiexec<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>./build/lab4_spmm<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">spmm_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>allgather
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>mpiexec<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>./build/lab4_spmm<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">spmm_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>halo
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>mpiexec<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>./build/lab4_spmm<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">spmm_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>overlap
 </code></pre></div>
 <p>将 <code>--profile banded</code> 替换为 <code>uniform</code>、<code>skewed</code> 或 <code>blocked</code>，即可切换输入分布。进程数通过 <code>mpiexec -n</code> 设置。</p>
 <p>Open MPI 提示 slots 不足时，在 <code>mpiexec</code> 后添加 <code>--oversubscribe</code>。<code>run.py</code> 使用 Open MPI 时自动添加该选项。</p>
 <p>可执行文件向终端输出 CSV。保存单次运行的数据：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>results/single
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>mpiexec<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>./build/lab4_spmm<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">spmm_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>halo<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>&gt;<span class="w"> </span>results/single/halo.csv
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>results/single
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>mpiexec<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span><span class="w"> </span>./build/lab4_spmm<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">spmm_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>halo<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span>&gt;<span class="w"> </span>results/single/halo.csv
 </code></pre></div>
-<h2 id="_7">分组运行<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<h2 id="_10">分组运行<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
 <p>改变 A 的进程划分方式，将每组输出保存到独立目录：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">for</span><span class="w"> </span>partition<span class="w"> </span><span class="k">in</span><span class="w"> </span>rows<span class="w"> </span>nnz<span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>python3<span class="w"> </span>run.py<span class="w"> </span>--partition<span class="w"> </span><span class="s2">"</span><span class="nv">$partition</span><span class="s2">"</span><span class="w"> </span>--output<span class="w"> </span><span class="s2">"results/partition_</span><span class="nv">$partition</span><span class="s2">"</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">done</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">for</span><span class="w"> </span>partition<span class="w"> </span><span class="k">in</span><span class="w"> </span>rows<span class="w"> </span>nnz<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span>python3<span class="w"> </span>run.py<span class="w"> </span>--partition<span class="w"> </span><span class="s2">"</span><span class="nv">$partition</span><span class="s2">"</span><span class="w"> </span>--output<span class="w"> </span><span class="s2">"results/partition_</span><span class="nv">$partition</span><span class="s2">"</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="k">done</span>
 </code></pre></div>
 <p>改变输出列块宽度：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">for</span><span class="w"> </span>tile<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">32</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="m">128</span><span class="w"> </span><span class="m">256</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span>python3<span class="w"> </span>run.py<span class="w"> </span>--tile<span class="w"> </span><span class="s2">"</span><span class="nv">$tile</span><span class="s2">"</span><span class="w"> </span>--output<span class="w"> </span><span class="s2">"results/tile_</span><span class="nv">$tile</span><span class="s2">"</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">done</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">for</span><span class="w"> </span>tile<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">32</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="m">128</span><span class="w"> </span><span class="m">256</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span>python3<span class="w"> </span>run.py<span class="w"> </span>--tile<span class="w"> </span><span class="s2">"</span><span class="nv">$tile</span><span class="s2">"</span><span class="w"> </span>--output<span class="w"> </span><span class="s2">"results/tile_</span><span class="nv">$tile</span><span class="s2">"</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="k">done</span>
 </code></pre></div>
 <p>多台主机运行时，在主机列表中逐行填写主机名及 slots，例如：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>node-a slots=2
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>node-b slots=2
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>node-a slots=2
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>node-b slots=2
 </code></pre></div>
 <p>各主机安装兼容的 MPI，使用相同架构的可执行文件，并使 <code>Lab4</code> 的绝对路径一致。配置主机之间免密 SSH 后，在其中一台执行：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--hostfile<span class="w"> </span>hosts.txt<span class="w"> </span>--ranks<span class="w"> </span><span class="m">4</span><span class="w"> </span>--output<span class="w"> </span>results/multiple_hosts
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--hostfile<span class="w"> </span>hosts.txt<span class="w"> </span>--ranks<span class="w"> </span><span class="m">4</span><span class="w"> </span>--output<span class="w"> </span>results/multiple_hosts
 </code></pre></div>
-<h2 id="_8">输出文件<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<h2 id="_11">怎样完成一组观察<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<p>每次固定输入与其他条件，只改变表中的一项。先核对正确性，再读取数据解释变化：</p>
+<table>
+<thead>
+<tr>
+<th>固定条件</th>
+<th>改变哪一项</th>
+<th>从哪里读数据</th>
+<th>要回答的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入、划分和进程数固定</td>
+<td>Broadcast → Allgather → Halo → Overlap</td>
+<td>median_ms、received_mib；各 rank 的 local_nnz / remote_nnz</td>
+<td>减少接收的数据量是否一定减少总耗时？</td>
+</tr>
+<tr>
+<td>输入、内核、tile 固定</td>
+<td>rows → nnz 划分</td>
+<td>各 rank 的 nnz、row_begin/end、rank_elapsed_s</td>
+<td>谁承担了更多计算，整体为什么等待最慢进程？</td>
+</tr>
+</tbody>
+</table>
+<p>为每组比较保留完整命令、环境文件、原始记录和汇总表；用一张对比表记录参数、耗时或周期，再写出“观察到什么、实现中哪一步能解释它”。性能趋势取决于机器与输入，不要求某个版本一定更快。</p>
+<h2 id="_12">输出文件<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
 <p><code>run.py</code> 默认将本次运行的数据保存到本实验的 <code>results/</code>，使用 <code>--output</code> 可以更改目录。</p>
 <table>
 <thead>
@@ -2382,6 +2530,7 @@
 </tbody>
 </table>
 <p>默认每次独立执行先预热一次，再测量七次，取各次最大进程耗时的中位数；进行三个批次后再取中位数。计时包含 B 数据打包、数据交换及本地乘法。输入生成、划分、交换计划构造、C 清零、计时前屏障和输出汇总位于计时之外。C 保留在各进程中，checksum 在计时后汇总。</p>
+<p>终端的 <code>i/total</code> 统计独立配置启动次数，每次启动还包含自己的预热与重复测量。<code>raw.csv</code> 在每个配置完成后保存，<code>summary.csv</code> 和最终图表在全部配置完成后生成。按 Ctrl+C 中断会保留已完成的原始记录；部分数据不能视为完整扫描结果。再次运行请换一个 <code>--output</code> 目录；脚本会重新测量，不自动续跑。</p>
 <p>常用 CSV 字段：</p>
 <table>
 <thead>

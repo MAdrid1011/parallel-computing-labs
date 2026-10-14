@@ -2177,7 +2177,7 @@
 <h2 id="3">3. 动态领取行<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
 <p><code>schedule(dynamic, 1)</code> 将一行作为一次领取的任务。线程完成当前行后继续领取下一行，直到所有行被处理。</p>
 <p>这样不必在开始时预测每个线程的总工作量，但领取任务本身也有开销。如果任务数量很多、每个任务很轻，就需要关注这一开销。</p>
-<p>实际源码通过 <code>schedule(runtime)</code> 使用运行参数设置的调度方式。查看 <code>src/main.cpp</code> 中的调度设置，再回到 <code>src/spmm_parallel.cpp</code> 中的循环。</p>
+<p>实际源码通过 <code>schedule(runtime)</code> 使用运行参数设置的调度方式。先在 <code>src/main.cpp</code> 找到 <code>schedule</code> 与 <code>chunk</code> 的参数解析，再看 <code>src/benchmark.cpp</code> 中将它们传给 <code>omp_set_schedule</code> 的位置，最后回到 <code>src/spmm_parallel.cpp</code> 中的 <code>schedule(runtime)</code> 循环。</p>
 <h2 id="4">4. 按非零数构造行块<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
 <p>另一种办法是在运行前，根据 CSR 的 <code>row_ptr</code> 构造若干连续行块，尽量让每块的非零数接近 <code>--block-nnz</code>。</p>
 <p>它仍然让完整输出行由同一个任务负责，同时把任务大小的依据从“行数”改为“非零数”。单行不会拆开，所以一个很重的行仍可能超过目标值。</p>
@@ -2194,7 +2194,7 @@
 </div>
 <p>打开 <code>src/spmm_tiled.cpp</code>：先找到行块、列块两层循环的 <code>collapse(2)</code>，再找到微块中的局部 <code>sums</code>。把这些位置与“任务区域”和“部分和”对应起来。</p>
 <h2 id="6">6. 动手试一试<a class="headerlink" href="#6" title="Permanent link">&para;</a></h2>
-<p>先按照<a href="../run/">操作步骤</a>完成构建并执行默认运行。随后从以下方向选择一个进行比较，命令都在 Lab1 中执行。</p>
+<p>先按照<a href="../run/">操作步骤</a>完成构建和快速验证，再执行完整测量。随后从以下方向选择一个进行比较，命令都在 Lab1 中执行。</p>
 <h3 id="_2">观察分工<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <p>在 <code>raw.csv</code> 中筛选 <code>record=thread</code>。固定 profile、实现和线程数，比较各线程的 <code>updates</code>、<code>compute_s</code> 与 <code>wait_s</code>。先看实际工作量是否相近，再看哪些线程先完成、哪些线程仍在计算。</p>
 <p>比较 <code>uniform</code> 与 <code>skewed</code> 时，固定维度和总非零数。再比较 Rows、Dynamic 和 NNZ blocks，观察改变任务分配后，线程统计怎样变化。</p>

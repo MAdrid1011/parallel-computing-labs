@@ -1331,7 +1331,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        构建与运行
+        构建
       
     </span>
   </a>
@@ -1342,7 +1342,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        设置运行参数
+        第一次运行：快速验证
       
     </span>
   </a>
@@ -1353,7 +1353,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        输入分布
+        完整测量
       
     </span>
   </a>
@@ -1364,7 +1364,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        单独运行一个实现
+        设置运行参数
       
     </span>
   </a>
@@ -1375,7 +1375,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        分组运行
+        参数范围与错误提示
       
     </span>
   </a>
@@ -1384,6 +1384,50 @@
       
         <li class="md-nav__item">
   <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        输入分布
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        单独运行一个实现
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        分组运行
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        怎样完成一组观察
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
     <span class="md-ellipsis">
       
         输出文件
@@ -2038,7 +2082,7 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        构建与运行
+        构建
       
     </span>
   </a>
@@ -2049,7 +2093,7 @@
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        设置运行参数
+        第一次运行：快速验证
       
     </span>
   </a>
@@ -2060,7 +2104,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        输入分布
+        完整测量
       
     </span>
   </a>
@@ -2071,7 +2115,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        单独运行一个实现
+        设置运行参数
       
     </span>
   </a>
@@ -2082,7 +2126,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        分组运行
+        参数范围与错误提示
       
     </span>
   </a>
@@ -2091,6 +2135,50 @@
       
         <li class="md-nav__item">
   <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        输入分布
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        单独运行一个实现
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        分组运行
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        怎样完成一组观察
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
     <span class="md-ellipsis">
       
         输出文件
@@ -2135,17 +2223,21 @@
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    histogram.hpp              计数内核、工作空间和线程统计
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    benchmark.hpp              运行参数
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    support.hpp                计时、随机数和 CSV 工具
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>  src/
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    main.cpp                   命令行参数
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    input.cpp                  输入生成
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    workspace.cpp              分段锁和线程私有计数空间
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    histogram_serial.cpp       串行计数
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    histogram_critical.cpp     全局临界区
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    histogram_atomic.cpp       原子加
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    histogram_locks.cpp        分段锁
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    histogram_private.cpp      线程私有计数和合并
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    benchmark.cpp              预热、测量和 CSV 输出
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>  run.py                       顺序测量和汇总
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    validation.hpp             命令行值与范围检查
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    verification.hpp           参考结果核对接口
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>  src/
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    main.cpp                   命令行参数
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    input.cpp                  输入生成
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    workspace.cpp              分段锁和线程私有计数空间
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    histogram_serial.cpp       串行计数
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    histogram_critical.cpp     全局临界区
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    histogram_atomic.cpp       原子加
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    histogram_locks.cpp        分段锁
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    histogram_private.cpp      线程私有计数和合并
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    benchmark.cpp              预热、测量和 CSV 输出
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    verification.cpp           逐元素或逐桶参考比较
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>  cli_utils.py                参数与构建目录检查
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>  run.py                       顺序测量和汇总
 </code></pre></div>
 <h2 id="_2">环境准备<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>进入 Lab3，后续命令都在这个文件夹内执行：</p>
@@ -2165,13 +2257,23 @@
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </code></pre></div>
-<h2 id="_3">构建与运行<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h2 id="_3">构建<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>--parallel<span class="w"> </span><span class="m">4</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>python3<span class="w"> </span>run.py
 </code></pre></div>
-<p>默认扫描 100 万、500 万、1000 万个输入，运行 uniform 和 hotspot 两种分布。每组输入运行串行、全局临界区、原子加、1/4/16/64 把分段锁和线程私有计数，扫描 1、2、4 线程。编译产物保存在本实验的 <code>build/</code>，运行数据保存在本实验的 <code>results/</code>。</p>
-<h2 id="_4">设置运行参数<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_4">第一次运行：快速验证<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>先运行这组小配置，确认环境、程序和输出均正常：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">10000</span><span class="w"> </span>--stripes<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">16</span><span class="w"> </span>--repeat<span class="w"> </span><span class="m">1</span><span class="w"> </span>--rounds<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>--verify<span class="w"> </span>--output<span class="w"> </span>results/quick
+</code></pre></div>
+<p>终端会显示 <code>Lab3 i/34</code> 的配置进度，并出现 <code>VERIFY PASS: 256 buckets</code>。PASS 后的误差或说明因实验而异。运行完成后，检查 <code>results/quick/environment.json</code>、<code>raw.csv</code>、<code>summary.csv</code> 和比较图表。</p>
+<p><code>--verify</code> 在计时之外逐元素或逐桶比较参考结果。错误会显示 <code>VERIFY FAIL</code>、第一个错误位置与期望值，并以非零退出码停止。浮点乘法使用 <code>1e-10 + 1e-9 × |参考值|</code> 的误差阈值；转置、计数和整数 GEMM 精确比较。<strong>小配置只确认功能，不能用于正式性能结论。</strong></p>
+<h2 id="_5">完整测量<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>确认快速验证通过后，再运行完整默认扫描：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python3<span class="w"> </span>run.py
+</code></pre></div>
+<p>完整默认扫描会启动 414 次独立程序。临界区和热点锁更新会串行化，完整扫描可能超过十分钟；首次操作请用上面的快速验证。默认扫描 100 万、500 万、1000 万个输入，运行 uniform 和 hotspot 两种分布。每组输入运行串行、全局临界区、原子加、1/4/16/64 把分段锁和线程私有计数，扫描 1、2、4 线程。编译产物保存在本实验的 <code>build/</code>，运行数据保存在本实验的 <code>results/</code>。</p>
+<h2 id="_6">设置运行参数<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>以下参数用于 <code>run.py</code>：</p>
 <table>
 <thead>
@@ -2232,21 +2334,40 @@
 <td><code>results/</code></td>
 <td>输出目录</td>
 </tr>
+<tr>
+<td><code>--verify</code></td>
+<td>关闭</td>
+<td>在计时之外逐元素或逐桶核对结果</td>
+</tr>
+<tr>
+<td><code>--build-dir</code></td>
+<td><code>build/</code></td>
+<td>选择构建目录；相对路径从本 Lab 目录解析</td>
+</tr>
 </tbody>
 </table>
 <p>指定全部主要参数：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">1000000</span><span class="w"> </span><span class="m">5000000</span><span class="w"> </span><span class="m">10000000</span><span class="w"> </span>--bins<span class="w"> </span><span class="m">256</span><span class="w"> </span>--stripes<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>--distribution<span class="w"> </span>uniform<span class="w"> </span>hotspot<span class="w"> </span>--hot-percent<span class="w"> </span><span class="m">90</span><span class="w"> </span>--threads<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>--repeat<span class="w"> </span><span class="m">7</span><span class="w"> </span>--rounds<span class="w"> </span><span class="m">3</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">2026</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">1000000</span><span class="w"> </span><span class="m">5000000</span><span class="w"> </span><span class="m">10000000</span><span class="w"> </span>--bins<span class="w"> </span><span class="m">256</span><span class="w"> </span>--stripes<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>--distribution<span class="w"> </span>uniform<span class="w"> </span>hotspot<span class="w"> </span>--hot-percent<span class="w"> </span><span class="m">90</span><span class="w"> </span>--threads<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>--repeat<span class="w"> </span><span class="m">7</span><span class="w"> </span>--rounds<span class="w"> </span><span class="m">3</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">2026</span>
 </code></pre></div>
-<p>修改 C++ 源码后，执行 <code>cmake --build build --parallel 4</code>，再运行 <code>python3 run.py</code>。</p>
-<h2 id="_5">输入分布<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>修改 C++ 源码后，先执行 <code>cmake --build build --parallel 4</code> 并重新运行快速验证，再进行正式测量。</p>
+<h2 id="_7">参数范围与错误提示<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p>N、bins、stripes、threads、repeat、rounds 必须为正整数；锁数可以超过桶数。<code>hot-percent</code> 为 0～100，<code>seed</code> 为 0～4294967295。</p>
+<p>程序与脚本会拒绝未知参数、缺失参数值和非法配置，并给出明确原因。可执行文件和 <code>run.py</code> 均支持 <code>--help</code>。</p>
+<p>切换到新构建目录时，构建和测量必须选择同一个目录，例如：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build-llvm<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build-llvm<span class="w"> </span>--parallel<span class="w"> </span><span class="m">4</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--build-dir<span class="w"> </span>build-llvm<span class="w"> </span>--help
+</code></pre></div>
+<p>实际测量时，把 <code>--build-dir build-llvm</code> 加到上面的快速验证命令或自己的参数组合中。<code>environment.json</code> 会记录实际构建目录与编译器。</p>
+<h2 id="_8">输入分布<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <ul>
 <li><code>uniform</code>：输入分散到全部 bucket。</li>
 <li><code>hotspot</code>：按 <code>hot-percent</code> 指定的比例映射到 bucket 0，其余输入分散到全部 bucket。</li>
 </ul>
 <p>hotspot 剩余输入也可能映射到 bucket 0，因此实际 bucket 0 占比略高于设置值。相同 N、bins、distribution、hot-percent 和 seed 下，各实现使用相同输入。</p>
-<h2 id="_6">单独运行一个实现<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_9">单独运行一个实现<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
 <p>直接运行可执行文件，通过 <code>--kernel</code>、<code>--distribution</code> 和 <code>--stripes</code> 选择实现、分布和锁数：</p>
 <table>
 <thead>
@@ -2285,34 +2406,61 @@
 </tbody>
 </table>
 <p>以下命令使用相同的输入参数，在 Bash 或 zsh 终端中执行：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">histogram_args</span><span class="o">=(</span>--n<span class="w"> </span><span class="m">10000000</span><span class="w"> </span>--bins<span class="w"> </span><span class="m">256</span><span class="w"> </span>--distribution<span class="w"> </span>uniform
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span>--hot-percent<span class="w"> </span><span class="m">90</span><span class="w"> </span>--threads<span class="w"> </span><span class="m">4</span><span class="w"> </span>--repeat<span class="w"> </span><span class="m">7</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">2026</span><span class="o">)</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>./build/lab3_histogram<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">histogram_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>serial
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>./build/lab3_histogram<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">histogram_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>critical
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>./build/lab3_histogram<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">histogram_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>atomic
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>./build/lab3_histogram<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">histogram_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>locks<span class="w"> </span>--stripes<span class="w"> </span><span class="m">16</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>./build/lab3_histogram<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">histogram_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>private
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">histogram_args</span><span class="o">=(</span>--n<span class="w"> </span><span class="m">10000000</span><span class="w"> </span>--bins<span class="w"> </span><span class="m">256</span><span class="w"> </span>--distribution<span class="w"> </span>uniform
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span>--hot-percent<span class="w"> </span><span class="m">90</span><span class="w"> </span>--threads<span class="w"> </span><span class="m">4</span><span class="w"> </span>--repeat<span class="w"> </span><span class="m">7</span><span class="w"> </span>--seed<span class="w"> </span><span class="m">2026</span><span class="o">)</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>./build/lab3_histogram<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">histogram_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>serial
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>./build/lab3_histogram<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">histogram_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>critical
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>./build/lab3_histogram<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">histogram_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>atomic
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>./build/lab3_histogram<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">histogram_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>locks<span class="w"> </span>--stripes<span class="w"> </span><span class="m">16</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>./build/lab3_histogram<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">histogram_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>private
 </code></pre></div>
 <p>将 <code>--distribution uniform</code> 替换为 <code>hotspot</code>，即可切换输入分布。将 <code>--stripes 16</code> 替换为其他锁数，运行对应的分段锁配置。</p>
 <p>可执行文件向终端输出 CSV。保存到文件时，在命令末尾加上重定向：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>results/single
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>./build/lab3_histogram<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">histogram_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>private<span class="w"> </span>&gt;<span class="w"> </span>results/single/private.csv
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>results/single
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>./build/lab3_histogram<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">histogram_args</span><span class="p">[@]</span><span class="si">}</span><span class="s2">"</span><span class="w"> </span>--kernel<span class="w"> </span>private<span class="w"> </span>&gt;<span class="w"> </span>results/single/private.csv
 </code></pre></div>
-<h2 id="_7">分组运行<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<h2 id="_10">分组运行<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
 <p>固定输入规模，指定多组锁数：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">10000000</span><span class="w"> </span>--stripes<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="m">256</span><span class="w"> </span>--output<span class="w"> </span>results/lock_counts
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">10000000</span><span class="w"> </span>--stripes<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="m">256</span><span class="w"> </span>--output<span class="w"> </span>results/lock_counts
 </code></pre></div>
 <p>固定锁数，指定多组输入规模：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">1000000</span><span class="w"> </span><span class="m">5000000</span><span class="w"> </span><span class="m">10000000</span><span class="w"> </span>--stripes<span class="w"> </span><span class="m">16</span><span class="w"> </span>--output<span class="w"> </span>results/lock16
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">1000000</span><span class="w"> </span><span class="m">5000000</span><span class="w"> </span><span class="m">10000000</span><span class="w"> </span>--stripes<span class="w"> </span><span class="m">16</span><span class="w"> </span>--output<span class="w"> </span>results/lock16
 </code></pre></div>
 <p>改变热点比例：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">for</span><span class="w"> </span>hot<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="m">90</span><span class="w"> </span><span class="m">99</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">10000000</span><span class="w"> </span>--distribution<span class="w"> </span>hotspot<span class="w"> </span>--hot-percent<span class="w"> </span><span class="s2">"</span><span class="nv">$hot</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span>--output<span class="w"> </span><span class="s2">"results/hot_</span><span class="nv">$hot</span><span class="s2">"</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="k">done</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">for</span><span class="w"> </span>hot<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="m">90</span><span class="w"> </span><span class="m">99</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span>python3<span class="w"> </span>run.py<span class="w"> </span>--n<span class="w"> </span><span class="m">10000000</span><span class="w"> </span>--distribution<span class="w"> </span>hotspot<span class="w"> </span>--hot-percent<span class="w"> </span><span class="s2">"</span><span class="nv">$hot</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span>--output<span class="w"> </span><span class="s2">"results/hot_</span><span class="nv">$hot</span><span class="s2">"</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="k">done</span>
 </code></pre></div>
-<h2 id="_8">输出文件<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<h2 id="_11">怎样完成一组观察<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<p>每次固定输入与其他条件，只改变表中的一项。先核对正确性，再读取数据解释变化：</p>
+<table>
+<thead>
+<tr>
+<th>固定条件</th>
+<th>改变哪一项</th>
+<th>从哪里读数据</th>
+<th>要回答的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>N、bins、分布和线程数固定</td>
+<td>Critical → Atomic → Locks → Private</td>
+<td>median_ms；线程 compute_s、merge_s、wait_s</td>
+<td>哪些共享更新被消除，增加了哪些合并工作？</td>
+</tr>
+<tr>
+<td>N、bins、线程数和热点比例固定</td>
+<td>stripes=1、4、16、64</td>
+<td>lock_count_speedup；对照 uniform / hotspot</td>
+<td>为什么更多锁不能分散对桶 0 的竞争？</td>
+</tr>
+</tbody>
+</table>
+<p>为每组比较保留完整命令、环境文件、原始记录和汇总表；用一张对比表记录参数、耗时或周期，再写出“观察到什么、实现中哪一步能解释它”。性能趋势取决于机器与输入，不要求某个版本一定更快。</p>
+<h2 id="_12">输出文件<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
 <p><code>run.py</code> 默认将本次运行的数据保存到本实验的 <code>results/</code>，使用 <code>--output</code> 可以更改目录。</p>
 <table>
 <thead>
@@ -2349,6 +2497,7 @@
 </tbody>
 </table>
 <p>默认每次独立执行先预热一次，再测量七次并取中位数；进行三个批次后再取中位数。计时包含并行区域启动、循环调度、计数更新、线程屏障和私有计数合并；输入生成、表清零、锁初始化、输出汇总和 checksum 计算在计时之外。</p>
+<p>终端的 <code>i/total</code> 统计独立配置启动次数，每次启动还包含自己的预热与重复测量。<code>raw.csv</code> 在每个配置完成后保存，<code>summary.csv</code> 和最终图表在全部配置完成后生成。按 Ctrl+C 中断会保留已完成的原始记录；部分数据不能视为完整扫描结果。再次运行请换一个 <code>--output</code> 目录；脚本会重新测量，不自动续跑。</p>
 <p>常用 CSV 字段：</p>
 <table>
 <thead>
@@ -2416,6 +2565,7 @@
 </tr>
 </tbody>
 </table>
+<p>如果实际线程数少于请求值，脚本会明确指出差异并停止汇总。检查 <code>OMP_THREAD_LIMIT</code> 等设置，或改用允许的 <code>--threads</code>；不要把实际两线程的记录当作四线程结果。</p>
 
 
 

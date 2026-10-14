@@ -1895,6 +1895,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        参数与验证
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2009,6 +2020,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        参数与验证
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2089,7 +2111,32 @@
 </details>
 <details class="question">
 <summary>checksum 相同是不是就说明完全正确？</summary>
-<p>它只表示输出元素总和相同，不足以证明每个元素正确。阅读实现时要确认输出归属、循环范围和同步方式。需要完整核对输出时，应逐元素比较；Lab5 提供 <code>--save-output</code> 保存 C。</p>
+<p>它只表示输出元素总和相同，不足以证明每个元素正确。阅读实现时要确认输出归属、循环范围和同步方式。完整核对输出时，使用各实验的 <code>--verify</code> 逐元素或逐桶比较；Lab5 还提供 <code>--save-output</code> 保存 C。</p>
+</details>
+<h2 id="_6">参数与验证<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<details class="question">
+<summary>换成 build-llvm 后为什么没有运行新程序？</summary>
+<p>Lab1～Lab4 的构建和测量必须选择同一个目录。执行 <code>python3 run.py --build-dir build-llvm ...</code>，把省略号替换为本实验快速验证页的参数。检查 <code>environment.json</code> 中的 <code>build_directory</code> 和 <code>compiler</code>。</p>
+</details>
+<details class="question">
+<summary>参数拼错、漏了值，或者分块设成 0？</summary>
+<p>程序会明确报错并退出。先执行 <code>--help</code>，按操作页检查参数范围。稀疏乘法的每行非零数不能超过 K；Lab5 的分块不能超过已构建的 SPM 容量。不要使用被拒绝配置的旧 CSV 作分析。</p>
+</details>
+<details class="question">
+<summary>请求四线程，程序却只得到两线程？</summary>
+<p>查看错误提示与 <code>environment.json</code> 中的 OpenMP 环境设置。已有 <code>OMP_THREAD_LIMIT=2</code> 会限制实际线程数。可以改为 <code>--threads 2</code>，或在确认不需要该限制后，在当前终端执行 <code>unset OMP_THREAD_LIMIT</code>。重新运行使用新的输出目录。</p>
+</details>
+<details class="question">
+<summary>如何确认修改后的实现仍正确？</summary>
+<p>重新构建，执行本实验的快速验证命令并保留 <code>--verify</code>。<code>VERIFY PASS</code> 表示当前输出通过逐元素或逐桶比较；<code>VERIFY FAIL</code> 会显示错误位置与期望值。仅比较 checksum 不够。小输入验证通过后，再做性能测量。</p>
+</details>
+<details class="question">
+<summary>扫描很久或中途按了 Ctrl+C，还能看哪些结果？</summary>
+<p>先看进度 <code>i/total</code>，完整默认扫描有大量独立配置。<code>raw.csv</code> 保存已完成配置，最终汇总与图表在全部完成后生成。中断不是完整实验结果，重新运行不自动续跑，请选择新的输出目录。</p>
+</details>
+<details class="question">
+<summary>Lab5 报 exceeded --max-cycles？</summary>
+<p>模型触及单次仿真的周期上限。先检查维度、分块、供数和握手；<code>stall-percent</code> 必须小于 100。确认任务规模确实更大后，再提高 <code>--max-cycles</code>，例如 <code>--max-cycles 200000000</code>。</p>
 </details>
 
 
