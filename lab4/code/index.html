@@ -1652,7 +1652,7 @@
   <a href="#1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. 每个进程负责哪些行？
+        1. 把同一个乘法分给两个进程
       
     </span>
   </a>
@@ -1660,10 +1660,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-b-c" class="md-nav__link">
+  <a href="#2-partition-a-c" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. 先获得完整 B，再计算本地 C
+        2. partition 只决定 A 和 C 怎样分行
       
     </span>
   </a>
@@ -1671,10 +1671,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-halo-b" class="md-nav__link">
+  <a href="#3-broadcast-allgather-b" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Halo 只收集实际引用的 B 行
+        3. Broadcast 与 Allgather 都让各进程获得完整 B
       
     </span>
   </a>
@@ -1682,10 +1682,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-overlap" class="md-nav__link">
+  <a href="#4-halo-a-b" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Overlap 在等远程行时计算什么？
+        4. Halo 根据 A 的非零列号，只交换需要的 B 行
       
     </span>
   </a>
@@ -1693,10 +1693,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5" class="md-nav__link">
+  <a href="#5-overlap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. 总时间为什么取最慢进程？
+        5. Overlap 先计算已经具备数据的部分
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 进程划分与本地分块的组合
       
     </span>
   </a>
@@ -2123,7 +2134,7 @@
   <a href="#1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. 每个进程负责哪些行？
+        1. 把同一个乘法分给两个进程
       
     </span>
   </a>
@@ -2131,10 +2142,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-b-c" class="md-nav__link">
+  <a href="#2-partition-a-c" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. 先获得完整 B，再计算本地 C
+        2. partition 只决定 A 和 C 怎样分行
       
     </span>
   </a>
@@ -2142,10 +2153,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-halo-b" class="md-nav__link">
+  <a href="#3-broadcast-allgather-b" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Halo 只收集实际引用的 B 行
+        3. Broadcast 与 Allgather 都让各进程获得完整 B
       
     </span>
   </a>
@@ -2153,10 +2164,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-overlap" class="md-nav__link">
+  <a href="#4-halo-a-b" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Overlap 在等远程行时计算什么？
+        4. Halo 根据 A 的非零列号，只交换需要的 B 行
       
     </span>
   </a>
@@ -2164,10 +2175,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5" class="md-nav__link">
+  <a href="#5-overlap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. 总时间为什么取最慢进程？
+        5. Overlap 先计算已经具备数据的部分
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 进程划分与本地分块的组合
       
     </span>
   </a>
@@ -2195,221 +2217,198 @@
 
 
 <h1 id="lab4">Lab4 核心代码讲解<a class="headerlink" href="#lab4" title="Permanent link">&para;</a></h1>
-<p>Lab4 继续计算 <code>C = A × B</code>，但每个 MPI 进程只保存一部分矩阵。A 的本地行决定了本进程负责哪些输出，而这些行的列索引决定了它需要哪些 B 行。围绕这一依赖关系，可以把实现分为数据划分、数据交换和本地计算三个部分。</p>
-<h2 id="1">1. 每个进程负责哪些行？<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
-<p><code>src/distribution.cpp</code> 中的 <code>make_distribution</code> 计算所有进程的行边界，再取出当前 rank 对应的区间。</p>
-<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/distribution.cpp#L10-L25">Lab4/src/distribution.cpp · L10–L25</a>（节选）</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-10">10</a></span>
-<span class="normal"><a href="#__codelineno-0-11">11</a></span>
-<span class="normal"><a href="#__codelineno-0-12">12</a></span>
-<span class="normal"><a href="#__codelineno-0-13">13</a></span>
-<span class="normal"><a href="#__codelineno-0-14">14</a></span>
-<span class="normal"><a href="#__codelineno-0-15">15</a></span>
-<span class="normal"><a href="#__codelineno-0-16">16</a></span>
-<span class="normal"><a href="#__codelineno-0-17">17</a></span>
-<span class="normal"><a href="#__codelineno-0-18">18</a></span>
-<span class="normal"><a href="#__codelineno-0-19">19</a></span>
-<span class="normal"><a href="#__codelineno-0-20">20</a></span>
-<span class="normal"><a href="#__codelineno-0-21">21</a></span>
-<span class="normal"><a href="#__codelineno-0-22">22</a></span>
-<span class="normal"><a href="#__codelineno-0-23">23</a></span>
-<span class="normal"><a href="#__codelineno-0-24">24</a></span>
-<span class="normal"><a href="#__codelineno-0-25">25</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">prefix</span><span class="p">(</span><span class="n">cfg</span><span class="p">.</span><span class="n">m</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">cfg</span><span class="p">.</span><span class="n">partition</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">"nnz"</span><span class="p">)</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">m</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="w">            </span><span class="n">prefix</span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prefix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">row_nonzeros</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">nnz_per_row</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">profile</span><span class="p">);</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">ranks</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="w">        </span><span class="n">d</span><span class="p">.</span><span class="n">a_offsets</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">partition</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">"rows"</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">m</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">ranks</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="w">            </span><span class="o">:</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">lower_bound</span><span class="p">(</span><span class="n">prefix</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">prefix</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span><span class="w"> </span><span class="n">prefix</span><span class="p">.</span><span class="n">back</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">ranks</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">prefix</span><span class="p">.</span><span class="n">begin</span><span class="p">());</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="w">        </span><span class="n">d</span><span class="p">.</span><span class="n">b_offsets</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">k</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">ranks</span><span class="p">;</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">a_offsets</span><span class="p">.</span><span class="n">back</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">m</span><span class="p">;</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">ranks</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="w">        </span><span class="n">d</span><span class="p">.</span><span class="n">b_counts</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">((</span><span class="n">d</span><span class="p">.</span><span class="n">b_offsets</span><span class="p">[</span><span class="n">p</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">b_offsets</span><span class="p">[</span><span class="n">p</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">n</span><span class="p">);</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="w">        </span><span class="n">d</span><span class="p">.</span><span class="n">b_displacements</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">b_offsets</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">n</span><span class="p">);</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">row_begin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">a_offsets</span><span class="p">[</span><span class="n">d</span><span class="p">.</span><span class="n">rank</span><span class="p">];</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">row_end</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">a_offsets</span><span class="p">[</span><span class="n">d</span><span class="p">.</span><span class="n">rank</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">b_begin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">b_offsets</span><span class="p">[</span><span class="n">d</span><span class="p">.</span><span class="n">rank</span><span class="p">];</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">b_end</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">b_offsets</span><span class="p">[</span><span class="n">d</span><span class="p">.</span><span class="n">rank</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span>
-</code></pre></div></td></tr></table></div>
-<p><code>a_offsets[p]</code> 是进程 p 所负责的 A 行段的起点，右端是 <code>a_offsets[p+1]</code>，同一进程也负责 C 的对应行。<code>partition=rows</code> 按行数均分；<code>partition=nnz</code> 先构造非零数前缀和，再用 <code>lower_bound</code> 寻找接近各份目标工作量的行边界。它不会拆开一行，因此非零数也不保证完全相等。</p>
-<p>B 按行数均分，与 A 选择哪种划分方式无关。<code>b_counts</code> 计算每个进程持有多少个 B 元素，<code>b_displacements</code> 给出这些元素在完整 B 中的起始偏移。两者都以 <code>MPI_DOUBLE</code> 元素为单位，不是字节数。</p>
-<p>接下来的准备过程使用这些全局行号生成本地矩阵：</p>
-<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/benchmark.cpp#L45-L49">Lab4/src/benchmark.cpp · L45–L49</a>（节选）</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-45">45</a></span>
-<span class="normal"><a href="#__codelineno-1-46">46</a></span>
-<span class="normal"><a href="#__codelineno-1-47">47</a></span>
-<span class="normal"><a href="#__codelineno-1-48">48</a></span>
-<span class="normal"><a href="#__codelineno-1-49">49</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-45" name="__codelineno-1-45"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">make_distribution</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="w"> </span><span class="n">comm</span><span class="p">);</span>
-<a id="__codelineno-1-46" name="__codelineno-1-46"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generate_sparse_rows</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">row_begin</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">row_end</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">nnz_per_row</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">profile</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">seed</span><span class="p">);</span>
-<a id="__codelineno-1-47" name="__codelineno-1-47"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generate_dense_rows</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">b_begin</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">b_end</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">seed</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-<a id="__codelineno-1-48" name="__codelineno-1-48"></a><span class="w">    </span><span class="n">DenseMatrix</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">n</span><span class="p">);</span>
-<a id="__codelineno-1-49" name="__codelineno-1-49"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">workspace</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prepare_workspace</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">comm</span><span class="p">);</span>
-</code></pre></div></td></tr></table></div>
-<p>本实验能根据全局坐标和种子重复生成相同数据，因此各进程直接生成自己的 A、B 行，没有先由 rank 0 保存整份 A 再分发。生成后的本地 A 用从 0 开始的行号存储，但其列索引仍指向全局 B 行。</p>
-<h2 id="2-b-c">2. 先获得完整 B，再计算本地 C<a class="headerlink" href="#2-b-c" title="Permanent link">&para;</a></h2>
-<p>Broadcast 的 rank 0 在准备阶段生成完整 B，其他进程为完整 B 分配空间。运行时先广播，再调用本地乘法：</p>
-<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/spmm_full.cpp#L11-L18">Lab4/src/spmm_full.cpp · L11–L18</a>（节选）</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-11">11</a></span>
-<span class="normal"><a href="#__codelineno-2-12">12</a></span>
-<span class="normal"><a href="#__codelineno-2-13">13</a></span>
-<span class="normal"><a href="#__codelineno-2-14">14</a></span>
+<p>Lab4 继续计算稀疏矩阵乘法。与 Lab1 的线程共同读取 B 不同，MPI 的每个进程有自己的内存，需要通过消息取得其他进程保存的数据。这里有两个相互联系的决定：每个进程负责计算 C 的哪些行，以及为了计算这些行，需要获得 B 的哪些行。</p>
+<p>程序在 <code>src/main.cpp</code> 中初始化 MPI，各进程进入 <code>benchmark</code> 后沿着同一条流程执行：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>make_distribution 确定归属
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    → 生成本进程的 A 行和 B 行
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    → prepare_workspace 准备本地行块与所需数据空间
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    → 所选 kernel 取得 B 并完成乘法
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    → 得到本进程负责的 C 行
+</code></pre></div>
+<p>C 的全部行由各进程的这些本地结果共同组成，计算完成后仍按行分布保存在各进程中。下面先确定数据归属，再看不同 kernel 怎样完成这条流程。</p>
+<h2 id="1">1. 把同一个乘法分给两个进程<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
+<p>沿用 Lab1 的小矩阵：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>A = [ 2  0  0 ]       B = [ 1   2   3   4 ]
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    [ 0  3  0 ]           [ 5   6   7   8 ]
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    [ 4  0  5 ]           [ 9  10  11  12 ]
+</code></pre></div>
+<p>现在使用两个进程，编号分别是 rank 0 和 rank 1。A 三行的非零数为 1、1、2，按非零数划分时，可以把前两行交给 rank 0，最后一行交给 rank 1：</p>
+<table>
+<thead>
+<tr>
+<th>进程</th>
+<th>保存的 A 行</th>
+<th>负责的 C 行</th>
+<th>本来持有的 B 行</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rank 0</td>
+<td>第 0、1 行</td>
+<td>第 0、1 行</td>
+<td>第 0 行</td>
+</tr>
+<tr>
+<td>rank 1</td>
+<td>第 2 行</td>
+<td>第 2 行</td>
+<td>第 1、2 行</td>
+</tr>
+</tbody>
+</table>
+<p>B 按行数划分。由于本例 B 有 3 行，代码使用的边界公式得到 rank 0 持有第 0 行、rank 1 持有第 1、2 行。</p>
+<p>负责某个 C 行，并不意味着所需 B 数据也在这个进程。例如 rank 0 要计算 <code>C[1,:] = 3 × B[1,:]</code>，但 B 的第 1 行在 rank 1。进程之间的通信就用来补齐这种计算依赖。</p>
+<h2 id="2-partition-a-c">2. partition 只决定 A 和 C 怎样分行<a class="headerlink" href="#2-partition-a-c" title="Permanent link">&para;</a></h2>
+<p>设置 <code>partition=rows</code> 时，程序根据行数划分 A。对这个 3 行的例子，rank 0 得到第 0 行，rank 1 得到第 1、2 行。</p>
+<p>设置 <code>partition=nnz</code> 时，根据累计非零数寻找行边界。本例共有 4 个非零元素，两个进程各承担约 2 个，因此 rank 0 得到前两行，rank 1 得到最后一行。两种划分都保留完整的行。</p>
+<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/distribution.cpp#L14-L17">Lab4/src/distribution.cpp · L14–L17</a>（节选）</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-14">14</a></span>
 <span class="normal"><a href="#__codelineno-2-15">15</a></span>
 <span class="normal"><a href="#__codelineno-2-16">16</a></span>
-<span class="normal"><a href="#__codelineno-2-17">17</a></span>
-<span class="normal"><a href="#__codelineno-2-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-11" name="__codelineno-2-11"></a><span class="kt">void</span><span class="w"> </span><span class="nf">broadcast</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">CsrMatrix</span><span class="o">&amp;</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">DenseMatrix</span><span class="o">&amp;</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">Workspace</span><span class="o">&amp;</span><span class="w"> </span><span class="n">w</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Config</span><span class="o">&amp;</span><span class="w"> </span><span class="n">cfg</span><span class="p">,</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12"></a><span class="w">                </span><span class="k">const</span><span class="w"> </span><span class="n">Distribution</span><span class="o">&amp;</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_Comm</span><span class="w"> </span><span class="n">comm</span><span class="p">,</span><span class="w"> </span><span class="n">RankStats</span><span class="o">&amp;</span><span class="w"> </span><span class="n">stat</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">();</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14"></a><span class="w">    </span><span class="n">MPI_Bcast</span><span class="p">(</span><span class="n">w</span><span class="p">.</span><span class="n">full_b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">w</span><span class="p">.</span><span class="n">full_b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">size</span><span class="p">()),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">comm</span><span class="p">);</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15"></a><span class="w">    </span><span class="n">stat</span><span class="p">.</span><span class="n">mpi_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">;</span>
-<a id="__codelineno-2-16" name="__codelineno-2-16"></a><span class="w">    </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">();</span>
-<a id="__codelineno-2-17" name="__codelineno-2-17"></a><span class="w">    </span><span class="n">multiply_tiled</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">full_b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">blocks</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">tile</span><span class="p">);</span>
-<a id="__codelineno-2-18" name="__codelineno-2-18"></a><span class="w">    </span><span class="n">stat</span><span class="p">.</span><span class="n">compute_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">;</span>
+<span class="normal"><a href="#__codelineno-2-17">17</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-14" name="__codelineno-2-14"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">ranks</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15"></a><span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">a_offsets</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">partition</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">"rows"</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">m</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">ranks</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16"></a><span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">lower_bound</span><span class="p">(</span><span class="n">prefix</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">prefix</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span><span class="w"> </span><span class="n">prefix</span><span class="p">.</span><span class="n">back</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">ranks</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">prefix</span><span class="p">.</span><span class="n">begin</span><span class="p">());</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17"></a><span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="n">b_offsets</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">k</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">ranks</span><span class="p">;</span>
 </code></pre></div></td></tr></table></div>
-<p><code>MPI_Bcast</code> 返回后，每个进程都有相同的 <code>w.full_b</code>。本地 A 的列索引可以直接索引它，计算结果只写入本地 C。</p>
-<p>Allgather 的出发点不同：各进程原本持有不同的 B 行，通过一次集合通信拼出完整 B。</p>
-<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/spmm_full.cpp#L21-L29">Lab4/src/spmm_full.cpp · L21–L29</a>（节选）</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-3-21">21</a></span>
-<span class="normal"><a href="#__codelineno-3-22">22</a></span>
-<span class="normal"><a href="#__codelineno-3-23">23</a></span>
-<span class="normal"><a href="#__codelineno-3-24">24</a></span>
-<span class="normal"><a href="#__codelineno-3-25">25</a></span>
-<span class="normal"><a href="#__codelineno-3-26">26</a></span>
-<span class="normal"><a href="#__codelineno-3-27">27</a></span>
-<span class="normal"><a href="#__codelineno-3-28">28</a></span>
-<span class="normal"><a href="#__codelineno-3-29">29</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-3-21" name="__codelineno-3-21"></a><span class="kt">void</span><span class="w"> </span><span class="nf">allgather</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">CsrMatrix</span><span class="o">&amp;</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">DenseMatrix</span><span class="o">&amp;</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">DenseMatrix</span><span class="o">&amp;</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">Workspace</span><span class="o">&amp;</span><span class="w"> </span><span class="n">w</span><span class="p">,</span>
-<a id="__codelineno-3-22" name="__codelineno-3-22"></a><span class="w">               </span><span class="k">const</span><span class="w"> </span><span class="n">Config</span><span class="o">&amp;</span><span class="w"> </span><span class="n">cfg</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Distribution</span><span class="o">&amp;</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_Comm</span><span class="w"> </span><span class="n">comm</span><span class="p">,</span><span class="w"> </span><span class="n">RankStats</span><span class="o">&amp;</span><span class="w"> </span><span class="n">stat</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-3-23" name="__codelineno-3-23"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">();</span>
-<a id="__codelineno-3-24" name="__codelineno-3-24"></a><span class="w">    </span><span class="n">MPI_Allgatherv</span><span class="p">(</span><span class="n">b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">size</span><span class="p">()),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span>
-<a id="__codelineno-3-25" name="__codelineno-3-25"></a><span class="w">                   </span><span class="n">w</span><span class="p">.</span><span class="n">full_b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">b_counts</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">b_displacements</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="w"> </span><span class="n">comm</span><span class="p">);</span>
-<a id="__codelineno-3-26" name="__codelineno-3-26"></a><span class="w">    </span><span class="n">stat</span><span class="p">.</span><span class="n">mpi_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">;</span>
-<a id="__codelineno-3-27" name="__codelineno-3-27"></a><span class="w">    </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">();</span>
-<a id="__codelineno-3-28" name="__codelineno-3-28"></a><span class="w">    </span><span class="n">multiply_tiled</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">full_b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">blocks</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">tile</span><span class="p">);</span>
-<a id="__codelineno-3-29" name="__codelineno-3-29"></a><span class="w">    </span><span class="n">stat</span><span class="p">.</span><span class="n">compute_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">;</span>
+<p><code>a_offsets</code> 保存 A 的分界位置，使用 rows 或 nnz 对应的规则；<code>b_offsets</code> 则始终根据 B 的行数划分。<code>prefix</code> 是 A 的非零数前缀和，用来找到累计工作量接近各份目标的位置。</p>
+<p>下面继续使用 <code>partition=nnz</code> 的分配。Broadcast、Allgather、Halo 和 Overlap 都可以在这个分配上运行，它们改变的是如何取得 B，而不是重新决定由谁计算 C 的某一行。</p>
+<h2 id="3-broadcast-allgather-b">3. Broadcast 与 Allgather 都让各进程获得完整 B<a class="headerlink" href="#3-broadcast-allgather-b" title="Permanent link">&para;</a></h2>
+<p>Broadcast 由 rank 0 准备完整 B，再把它广播给所有进程：</p>
+<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/spmm_full.cpp#L14-L14">Lab4/src/spmm_full.cpp · L14–L14</a>（节选）</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-3-14">14</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-3-14" name="__codelineno-3-14"></a><span class="n">MPI_Bcast</span><span class="p">(</span><span class="n">w</span><span class="p">.</span><span class="n">full_b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">w</span><span class="p">.</span><span class="n">full_b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">size</span><span class="p">()),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">comm</span><span class="p">);</span>
 </code></pre></div></td></tr></table></div>
-<p><code>b_counts</code> 说明每份数据有多长，<code>b_displacements</code> 说明它应该放到完整 B 的哪里。两个版本在通信后使用同一个 <code>multiply_tiled</code> 内核，因此比较时主要关注获得 B 的方式及其开销。</p>
-<h2 id="3-halo-b">3. Halo 只收集实际引用的 B 行<a class="headerlink" href="#3-halo-b" title="Permanent link">&para;</a></h2>
-<p>如果本地 A 只引用少量不同的列，收集完整 B 就会传来许多用不到的数据。<code>src/communication_plan.cpp</code> 先从本地 A 的列索引构造需求集合：</p>
-<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/communication_plan.cpp#L16-L28">Lab4/src/communication_plan.cpp · L16–L28</a>（节选）</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-16">16</a></span>
-<span class="normal"><a href="#__codelineno-4-17">17</a></span>
-<span class="normal"><a href="#__codelineno-4-18">18</a></span>
-<span class="normal"><a href="#__codelineno-4-19">19</a></span>
-<span class="normal"><a href="#__codelineno-4-20">20</a></span>
-<span class="normal"><a href="#__codelineno-4-21">21</a></span>
-<span class="normal"><a href="#__codelineno-4-22">22</a></span>
-<span class="normal"><a href="#__codelineno-4-23">23</a></span>
-<span class="normal"><a href="#__codelineno-4-24">24</a></span>
-<span class="normal"><a href="#__codelineno-4-25">25</a></span>
-<span class="normal"><a href="#__codelineno-4-26">26</a></span>
-<span class="normal"><a href="#__codelineno-4-27">27</a></span>
-<span class="normal"><a href="#__codelineno-4-28">28</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-4-16" name="__codelineno-4-16"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">columns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">col_idx</span><span class="p">;</span>
-<a id="__codelineno-4-17" name="__codelineno-4-17"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">sort</span><span class="p">(</span><span class="n">columns</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">columns</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
-<a id="__codelineno-4-18" name="__codelineno-4-18"></a><span class="w">    </span><span class="n">columns</span><span class="p">.</span><span class="n">erase</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">unique</span><span class="p">(</span><span class="n">columns</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">columns</span><span class="p">.</span><span class="n">end</span><span class="p">()),</span><span class="w"> </span><span class="n">columns</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
-<a id="__codelineno-4-19" name="__codelineno-4-19"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">local_rows</span><span class="p">,</span><span class="w"> </span><span class="n">requested_rows</span><span class="p">;</span>
-<a id="__codelineno-4-20" name="__codelineno-4-20"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">receive_rows</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">ranks</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">send_rows</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">ranks</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<a id="__codelineno-4-21" name="__codelineno-4-21"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">column</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">columns</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-22" name="__codelineno-4-22"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">column</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">b_begin</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">column</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">b_end</span><span class="p">)</span><span class="w"> </span><span class="n">local_rows</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">column</span><span class="p">);</span>
-<a id="__codelineno-4-23" name="__codelineno-4-23"></a><span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-24" name="__codelineno-4-24"></a><span class="w">            </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">owner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">upper_bound</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">b_offsets</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">b_offsets</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span><span class="w"> </span><span class="n">column</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">b_offsets</span><span class="p">.</span><span class="n">begin</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-<a id="__codelineno-4-25" name="__codelineno-4-25"></a><span class="w">            </span><span class="o">++</span><span class="n">receive_rows</span><span class="p">[</span><span class="n">owner</span><span class="p">];</span><span class="w"> </span><span class="n">requested_rows</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">column</span><span class="p">);</span>
-<a id="__codelineno-4-26" name="__codelineno-4-26"></a><span class="w">        </span><span class="p">}</span>
-<a id="__codelineno-4-27" name="__codelineno-4-27"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-4-28" name="__codelineno-4-28"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">receive_offsets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">displacements</span><span class="p">(</span><span class="n">receive_rows</span><span class="p">);</span>
+<p>本例广播后，rank 0 与 rank 1 都有 B 的全部 3 行。rank 0 用它们计算 C 的前两行，rank 1 用它们计算最后一行。</p>
+<p>Allgather 则让每个进程贡献原本持有的 B 行，一起拼出完整 B：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>rank 0 提供 B 第 0 行 ──┐
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>                       ├─ 每个进程得到 B 的第 0、1、2 行
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>rank 1 提供 B 第 1、2 行 ┘
+</code></pre></div>
+<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/spmm_full.cpp#L24-L25">Lab4/src/spmm_full.cpp · L24–L25</a>（节选）</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-24">24</a></span>
+<span class="normal"><a href="#__codelineno-5-25">25</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-24" name="__codelineno-5-24"></a><span class="n">MPI_Allgatherv</span><span class="p">(</span><span class="n">b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">size</span><span class="p">()),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span>
+<a id="__codelineno-5-25" name="__codelineno-5-25"></a><span class="w">               </span><span class="n">w</span><span class="p">.</span><span class="n">full_b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">b_counts</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">b_displacements</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="w"> </span><span class="n">comm</span><span class="p">);</span>
 </code></pre></div></td></tr></table></div>
-<p>排序和去重使一个 B 行只请求一次，即使本地 A 中有很多非零元素引用它。落在 <code>[b_begin,b_end)</code> 的行已经在本进程，其他行则根据 <code>b_offsets</code> 找到所属进程，并累计需要向它接收的行数。</p>
-<p>随后，程序先交换“需要哪些行”的编号，让每个进程知道应该发送自己的哪些行。收到的实际 B 数据保存在 <code>needed_b</code> 中：前部放本地所需行，后部放远程所需行。由于行号已经压缩，计划中的 <code>slot</code> 会把 A 的全局列号改写为 <code>needed_b</code> 中的槽号。</p>
-<p>例如，本进程只需要全局 B 的第 1、7、9 行，且第 1 行属于自己，那么 <code>needed_b</code> 可以依次保存这三行。相应的 A 列号会从 1、7、9 改成 0、1、2，原有乘法内核因而仍能通过列索引找到正确数据。</p>
-<p>准备好计划后，每次 Halo 运行执行：</p>
-<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/spmm_halo.cpp#L8-L17">Lab4/src/spmm_halo.cpp · L8–L17</a>（节选）</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-5-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-5-10">10</a></span>
-<span class="normal"><a href="#__codelineno-5-11">11</a></span>
-<span class="normal"><a href="#__codelineno-5-12">12</a></span>
-<span class="normal"><a href="#__codelineno-5-13">13</a></span>
-<span class="normal"><a href="#__codelineno-5-14">14</a></span>
-<span class="normal"><a href="#__codelineno-5-15">15</a></span>
-<span class="normal"><a href="#__codelineno-5-16">16</a></span>
-<span class="normal"><a href="#__codelineno-5-17">17</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-8" name="__codelineno-5-8"></a><span class="w">    </span><span class="n">pack_send_rows</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">);</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9"></a><span class="w">    </span><span class="n">stat</span><span class="p">.</span><span class="n">pack_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">;</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10"></a><span class="w">    </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">();</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11"></a><span class="w">    </span><span class="n">MPI_Alltoallv</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="n">send_values</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">send_counts</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">send_displacements</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12"></a><span class="w">                  </span><span class="n">h</span><span class="p">.</span><span class="n">needed_b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">data</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">local_b_rows</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">n</span><span class="p">,</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13"></a><span class="w">                  </span><span class="n">h</span><span class="p">.</span><span class="n">receive_counts</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">receive_displacements</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="w"> </span><span class="n">comm</span><span class="p">);</span>
-<a id="__codelineno-5-14" name="__codelineno-5-14"></a><span class="w">    </span><span class="n">stat</span><span class="p">.</span><span class="n">mpi_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">;</span>
-<a id="__codelineno-5-15" name="__codelineno-5-15"></a><span class="w">    </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">();</span>
-<a id="__codelineno-5-16" name="__codelineno-5-16"></a><span class="w">    </span><span class="n">multiply_tiled</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="n">all</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">needed_b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">blocks</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">tile</span><span class="p">);</span>
-<a id="__codelineno-5-17" name="__codelineno-5-17"></a><span class="w">    </span><span class="n">stat</span><span class="p">.</span><span class="n">compute_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">;</span>
-</code></pre></div></td></tr></table></div>
-<p><code>pack_send_rows</code> 复制当前所需的本地 B 行，并按发送计划打包其他进程请求的行。<code>MPI_Alltoallv</code> 允许各进程之间交换不同长度的数据；接收指针跳过本地前缀，将远程行直接写入预留的后部区域。通信完成后，<code>h.all</code> 使用改写后的列索引完成乘法。</p>
-<p>请求行号的交换与索引改写属于准备阶段，计入 <code>setup_s</code>；每轮实际数据的打包、交换和计算计入 <code>elapsed_s</code>。因此，<code>receive_bytes</code> 描述的是 B 数据的逻辑字节数，没有把计划元数据或 MPI 协议开销算进去。</p>
-<h2 id="4-overlap">4. Overlap 在等远程行时计算什么？<a class="headerlink" href="#4-overlap" title="Permanent link">&para;</a></h2>
-<p>准备阶段还把 A 的非零元素分成 <code>h.local</code> 和 <code>h.remote</code>：前者只引用本地 B，后者引用需要接收的远程 B。两部分的行数相同，可以分别计算并累加到同一个 C。</p>
-<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/spmm_overlap.cpp#L10-L28">Lab4/src/spmm_overlap.cpp · L10–L28</a>（节选）</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-10">10</a></span>
-<span class="normal"><a href="#__codelineno-6-11">11</a></span>
-<span class="normal"><a href="#__codelineno-6-12">12</a></span>
-<span class="normal"><a href="#__codelineno-6-13">13</a></span>
-<span class="normal"><a href="#__codelineno-6-14">14</a></span>
-<span class="normal"><a href="#__codelineno-6-15">15</a></span>
-<span class="normal"><a href="#__codelineno-6-16">16</a></span>
+<p><code>b_counts</code> 说明各进程提供多少个元素，<code>b_displacements</code> 说明各份数据放在完整 B 的哪里。获得完整 B 后，两种实现都调用同一个 <code>multiply_tiled</code> 完成本地乘法。</p>
+<p>它们是两种获得完整 B 的方式：Broadcast 从 rank 0 发出整份数据，Allgather 从各进程收集各自的数据片段。</p>
+<h2 id="4-halo-a-b">4. Halo 根据 A 的非零列号，只交换需要的 B 行<a class="headerlink" href="#4-halo-a-b" title="Permanent link">&para;</a></h2>
+<p>本例中，rank 0 的 A 行只引用 B 的第 0、1 行，rank 1 的 A 行只引用 B 的第 0、2 行。因此可以只补齐缺少的部分：</p>
+<table>
+<thead>
+<tr>
+<th>进程</th>
+<th>计算所需的 B 行</th>
+<th>已经在自己这里</th>
+<th>需要向其他进程取得</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rank 0</td>
+<td>0、1</td>
+<td>0</td>
+<td>向 rank 1 取得第 1 行</td>
+</tr>
+<tr>
+<td>rank 1</td>
+<td>0、2</td>
+<td>2</td>
+<td>向 rank 0 取得第 0 行</td>
+</tr>
+</tbody>
+</table>
+<p>Halo 就使用这个规则。A 的列号 k 告诉程序需要 B 的第 k 行；同一行 B 被引用多次时，只需要请求一份。</p>
+<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/communication_plan.cpp#L16-L18">Lab4/src/communication_plan.cpp · L16–L18</a>（节选）</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-16">16</a></span>
 <span class="normal"><a href="#__codelineno-6-17">17</a></span>
-<span class="normal"><a href="#__codelineno-6-18">18</a></span>
-<span class="normal"><a href="#__codelineno-6-19">19</a></span>
-<span class="normal"><a href="#__codelineno-6-20">20</a></span>
-<span class="normal"><a href="#__codelineno-6-21">21</a></span>
-<span class="normal"><a href="#__codelineno-6-22">22</a></span>
-<span class="normal"><a href="#__codelineno-6-23">23</a></span>
-<span class="normal"><a href="#__codelineno-6-24">24</a></span>
-<span class="normal"><a href="#__codelineno-6-25">25</a></span>
-<span class="normal"><a href="#__codelineno-6-26">26</a></span>
-<span class="normal"><a href="#__codelineno-6-27">27</a></span>
-<span class="normal"><a href="#__codelineno-6-28">28</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-10" name="__codelineno-6-10"></a><span class="w">    </span><span class="n">MPI_Request</span><span class="w"> </span><span class="n">request</span><span class="p">;</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11"></a><span class="w">    </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">();</span>
-<a id="__codelineno-6-12" name="__codelineno-6-12"></a><span class="w">    </span><span class="c1">// Local entries read only the local prefix of needed_b. The receive writes</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13"></a><span class="w">    </span><span class="c1">// its remote suffix, which is not read until the request has completed.</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14"></a><span class="w">    </span><span class="n">MPI_Ialltoallv</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="n">send_values</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">send_counts</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">send_displacements</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span>
-<a id="__codelineno-6-15" name="__codelineno-6-15"></a><span class="w">                   </span><span class="n">h</span><span class="p">.</span><span class="n">needed_b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">data</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">local_b_rows</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">n</span><span class="p">,</span>
-<a id="__codelineno-6-16" name="__codelineno-6-16"></a><span class="w">                   </span><span class="n">h</span><span class="p">.</span><span class="n">receive_counts</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">receive_displacements</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="w"> </span><span class="n">comm</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">request</span><span class="p">);</span>
-<a id="__codelineno-6-17" name="__codelineno-6-17"></a><span class="w">    </span><span class="n">stat</span><span class="p">.</span><span class="n">mpi_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">;</span>
-<a id="__codelineno-6-18" name="__codelineno-6-18"></a><span class="w">    </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">();</span>
-<a id="__codelineno-6-19" name="__codelineno-6-19"></a><span class="w">    </span><span class="n">multiply_tiled</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="n">local</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">needed_b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">blocks</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">tile</span><span class="p">);</span>
-<a id="__codelineno-6-20" name="__codelineno-6-20"></a><span class="w">    </span><span class="n">stat</span><span class="p">.</span><span class="n">compute_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">;</span>
-<a id="__codelineno-6-21" name="__codelineno-6-21"></a><span class="w">    </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">();</span>
-<a id="__codelineno-6-22" name="__codelineno-6-22"></a><span class="w">    </span><span class="n">MPI_Wait</span><span class="p">(</span><span class="o">&amp;</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_STATUS_IGNORE</span><span class="p">);</span>
-<a id="__codelineno-6-23" name="__codelineno-6-23"></a><span class="w">    </span><span class="n">stat</span><span class="p">.</span><span class="n">wait_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">;</span>
-<a id="__codelineno-6-24" name="__codelineno-6-24"></a><span class="w">    </span><span class="n">stat</span><span class="p">.</span><span class="n">mpi_s</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">stat</span><span class="p">.</span><span class="n">wait_s</span><span class="p">;</span>
-<a id="__codelineno-6-25" name="__codelineno-6-25"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">h</span><span class="p">.</span><span class="n">remote</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-26" name="__codelineno-6-26"></a><span class="w">        </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">();</span>
-<a id="__codelineno-6-27" name="__codelineno-6-27"></a><span class="w">        </span><span class="n">multiply_tiled</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="n">remote</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">needed_b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">blocks</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">tile</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
-<a id="__codelineno-6-28" name="__codelineno-6-28"></a><span class="w">        </span><span class="n">stat</span><span class="p">.</span><span class="n">compute_s</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">;</span>
+<span class="normal"><a href="#__codelineno-6-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-16" name="__codelineno-6-16"></a><span class="k">auto</span><span class="w"> </span><span class="n">columns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">col_idx</span><span class="p">;</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17"></a><span class="n">std</span><span class="o">::</span><span class="n">sort</span><span class="p">(</span><span class="n">columns</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">columns</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18"></a><span class="n">columns</span><span class="p">.</span><span class="n">erase</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">unique</span><span class="p">(</span><span class="n">columns</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">columns</span><span class="p">.</span><span class="n">end</span><span class="p">()),</span><span class="w"> </span><span class="n">columns</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
 </code></pre></div></td></tr></table></div>
-<p>这里的先后关系决定了正确性：</p>
-<ol>
-<li><code>MPI_Ialltoallv</code> 发起交换后返回一个 request，通信仍可能在进行。</li>
-<li><code>multiply_tiled(h.local, ...)</code> 只读取 <code>needed_b</code> 的本地前缀；通信接收只写远程后缀，两者的访问范围不冲突。</li>
-<li><code>MPI_Wait</code> 确认请求完成，此后才能读取远程部分。</li>
-<li>最后的 <code>true</code> 表示把远程贡献加到已有 C，而不是覆盖此前算出的本地贡献。</li>
-</ol>
-<p>“累加还是覆盖”在微内核的输出语句中实现：</p>
-<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/spmm_tiled.cpp#L16-L18">Lab4/src/spmm_tiled.cpp · L16–L18</a>（节选）</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-7-16">16</a></span>
-<span class="normal"><a href="#__codelineno-7-17">17</a></span>
-<span class="normal"><a href="#__codelineno-7-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-7-16" name="__codelineno-7-16"></a><span class="w">    </span><span class="k">auto</span><span class="o">*</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">data</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">cols</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">column</span><span class="p">;</span>
-<a id="__codelineno-7-17" name="__codelineno-7-17"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="w"> </span><span class="n">lane</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">lane</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">Width</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">lane</span><span class="p">)</span>
-<a id="__codelineno-7-18" name="__codelineno-7-18"></a><span class="w">        </span><span class="n">output</span><span class="p">[</span><span class="n">lane</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sums</span><span class="p">[</span><span class="n">lane</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">add</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">output</span><span class="p">[</span><span class="n">lane</span><span class="p">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<p>排序和去重后，程序区分已有的行和需要请求的行，并交换请求列表。正式搬运数据时，用 <code>MPI_Alltoallv</code> 按计划发送所需 B 行：</p>
+<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/spmm_halo.cpp#L11-L13">Lab4/src/spmm_halo.cpp · L11–L13</a>（节选）</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-7-11">11</a></span>
+<span class="normal"><a href="#__codelineno-7-12">12</a></span>
+<span class="normal"><a href="#__codelineno-7-13">13</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-7-11" name="__codelineno-7-11"></a><span class="n">MPI_Alltoallv</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="n">send_values</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">send_counts</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">send_displacements</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12"></a><span class="w">              </span><span class="n">h</span><span class="p">.</span><span class="n">needed_b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">data</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">local_b_rows</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">n</span><span class="p">,</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13"></a><span class="w">              </span><span class="n">h</span><span class="p">.</span><span class="n">receive_counts</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">receive_displacements</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="w"> </span><span class="n">comm</span><span class="p">);</span>
 </code></pre></div></td></tr></table></div>
-<p>如果省略最后的累加，本地部分就会丢失。另一方面，使用非阻塞接口只创造了重叠的机会：实际收益取决于本地可计算工作量，以及 MPI 实现能否在计算期间推进通信。<code>wait_s</code> 记录到达 <code>MPI_Wait</code> 后还要等多久，不能仅凭调用了 <code>MPI_Ialltoallv</code> 就认定通信已被隐藏。</p>
-<h2 id="5">5. 总时间为什么取最慢进程？<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
-<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/benchmark.cpp#L68-L70">Lab4/src/benchmark.cpp · L68–L70</a>（节选）</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-8-68">68</a></span>
-<span class="normal"><a href="#__codelineno-8-69">69</a></span>
-<span class="normal"><a href="#__codelineno-8-70">70</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-8-68" name="__codelineno-8-68"></a><span class="w">        </span><span class="n">stat</span><span class="p">.</span><span class="n">rank_elapsed_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MPI_Wtime</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">;</span>
-<a id="__codelineno-8-69" name="__codelineno-8-69"></a><span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">elapsed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-8-70" name="__codelineno-8-70"></a><span class="w">        </span><span class="n">MPI_Reduce</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stat</span><span class="p">.</span><span class="n">rank_elapsed_s</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">elapsed</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_MAX</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">comm</span><span class="p">);</span>
+<p>收集到的行保存在紧凑矩阵 <code>needed_b</code> 中。本例 rank 1 已有 B 第 2 行，将它放在槽 0，收到的 B 第 0 行放在槽 1。A 原来的列号 0、2 也相应改成槽号 1、0，原有乘法循环就能在这份较小的矩阵中找到正确数据。</p>
+<p>Halo 先等所需的行到齐，再完成本地乘法。与收集完整 B 相比，它改变了保存和交换的数据范围，结果 C 保持相同。</p>
+<h2 id="5-overlap">5. Overlap 先计算已经具备数据的部分<a class="headerlink" href="#5-overlap" title="Permanent link">&para;</a></h2>
+<p>Overlap 使用与 Halo 相同的需求列表，但把计算分成已有数据和远程数据两部分。对 rank 1 的输出行，有：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>C 的第 2 行 = 4 × B 的第 0 行 + 5 × B 的第 2 行
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>                需要接收             本地已有
+</code></pre></div>
+<p>因此 rank 1 可以发起交换后，先用已有的 B 第 2 行计算一份部分结果：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>先计算本地贡献：5 × [9,10,11,12] = [45,50,55,60]
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>收到远程行以后：4 × [1, 2, 3, 4] = [ 4, 8,12,16]
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>两份贡献相加：                   [49,58,67,76]
+</code></pre></div>
+<p>源码先用非阻塞接口发起交换：</p>
+<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/spmm_overlap.cpp#L14-L16">Lab4/src/spmm_overlap.cpp · L14–L16</a>（节选）</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-10-14">14</a></span>
+<span class="normal"><a href="#__codelineno-10-15">15</a></span>
+<span class="normal"><a href="#__codelineno-10-16">16</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-10-14" name="__codelineno-10-14"></a><span class="n">MPI_Ialltoallv</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="n">send_values</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">send_counts</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">send_displacements</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15"></a><span class="w">               </span><span class="n">h</span><span class="p">.</span><span class="n">needed_b</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">data</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">local_b_rows</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">n</span><span class="p">,</span>
+<a id="__codelineno-10-16" name="__codelineno-10-16"></a><span class="w">               </span><span class="n">h</span><span class="p">.</span><span class="n">receive_counts</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">receive_displacements</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">MPI_DOUBLE</span><span class="p">,</span><span class="w"> </span><span class="n">comm</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">request</span><span class="p">);</span>
 </code></pre></div></td></tr></table></div>
-<p>每个进程记录自己完成本轮交换与计算的耗时，再用 <code>MPI_MAX</code> 汇总。整个结果需要所有进程共同完成，所以一个进程提前结束，并不能让本轮计算提前结束。</p>
-<p>按照<a href="../run/">操作步骤</a>比较时，可以先用 <code>nnz</code> 与 <code>rank_elapsed_s</code> 看 A 的工作量是否均衡，再用 <code>local_nnz</code>、<code>remote_nnz</code> 和 <code>receive_bytes</code> 看数据依赖。最后比较 Halo 与 Overlap 的 <code>elapsed_s</code> 和 <code>wait_s</code>，判断本地计算是否提供了足够的重叠空间。汇总的各阶段最大值可能来自不同 rank，不能直接相加还原总时间。</p>
+<p>这个调用返回后，数据可能还在传输，程序可以继续执行其他计算。<code>h.local</code> 保存只引用本地 B 行的 A 元素，用来先计算本地贡献：</p>
+<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/spmm_overlap.cpp#L19-L19">Lab4/src/spmm_overlap.cpp · L19–L19</a>（节选）</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-11-19">19</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-11-19" name="__codelineno-11-19"></a><span class="n">multiply_tiled</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="n">local</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">needed_b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">blocks</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">tile</span><span class="p">);</span>
+</code></pre></div></td></tr></table></div>
+<p>这里的 local 和 remote 根据 <strong>B 的行位于哪个进程</strong>来区分。同一行 A 可以同时含有两种元素，就像本例 A 第 2 行中的 4 和 5。</p>
+<p>读取远程数据前，<code>MPI_Wait</code> 确认接收完成，随后把 <code>h.remote</code> 的贡献加到已有结果：</p>
+<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/spmm_overlap.cpp#L22-L22">Lab4/src/spmm_overlap.cpp · L22–L22</a>（节选）</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-12-22">22</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-12-22" name="__codelineno-12-22"></a><span class="n">MPI_Wait</span><span class="p">(</span><span class="o">&amp;</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">MPI_STATUS_IGNORE</span><span class="p">);</span>
+</code></pre></div></td></tr></table></div>
+<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/spmm_overlap.cpp#L27-L27">Lab4/src/spmm_overlap.cpp · L27–L27</a>（节选）</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-13-27">27</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-13-27" name="__codelineno-13-27"></a><span class="n">multiply_tiled</span><span class="p">(</span><span class="n">h</span><span class="p">.</span><span class="n">remote</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="n">needed_b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">blocks</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">.</span><span class="n">tile</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
+</code></pre></div></td></tr></table></div>
+<p>最后一个参数 <code>true</code> 表示保留原有 C，再加本次部分和。输出语句为：</p>
+<p>源码：<a href="https://github.com/MAdrid1011/parallel-computing-labs/blob/main/Lab4/src/spmm_tiled.cpp#L18-L18">Lab4/src/spmm_tiled.cpp · L18–L18</a>（节选）</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-14-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-14-18" name="__codelineno-14-18"></a><span class="n">output</span><span class="p">[</span><span class="n">lane</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sums</span><span class="p">[</span><span class="n">lane</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">add</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">output</span><span class="p">[</span><span class="n">lane</span><span class="p">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+</code></pre></div></td></tr></table></div>
+<p>这一步把 <code>[45,50,55,60]</code> 与 <code>[4,8,12,16]</code> 合在一起。Halo 与 Overlap 请求相同的远程行；Overlap 进一步安排了这些行到达前可以完成的计算。</p>
+<h2 id="6">6. 进程划分与本地分块的组合<a class="headerlink" href="#6" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>决定什么</th>
+<th>在本例中的含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ranks</code></td>
+<td>参加计算的 MPI 进程数</td>
+<td>使用 rank 0、rank 1 两个进程</td>
+</tr>
+<tr>
+<td><code>partition</code></td>
+<td>每个进程负责哪些 A 行和 C 行</td>
+<td>nnz 划分使前两行和最后一行分属两个进程</td>
+</tr>
+<tr>
+<td><code>kernel</code></td>
+<td>怎样获得 B、怎样安排本地与远程贡献</td>
+<td>选择 Broadcast、Allgather、Halo 或 Overlap</td>
+</tr>
+<tr>
+<td><code>block-nnz</code></td>
+<td>一个进程内部怎样把自己的 A 行组成行块</td>
+<td>分组本地行，不会再创建 MPI 进程</td>
+</tr>
+<tr>
+<td><code>tile</code></td>
+<td>本地乘法一次处理多少输出列</td>
+<td>tile=2 时，4 列分为前两列、后两列</td>
+</tr>
+</tbody>
+</table>
+<p>可以把整个过程看成两层：先决定各进程拥有哪些输出行，再在每个进程内部按行块和列块组织乘法。这里的本地内核按循环依次处理这些块，Lab4 没有再为这些块启动 OpenMP 线程。</p>
+<p>改变 partition 会改变进程的工作和所需 B 行；在相同 partition 上改变通信内核，则保留输出行的归属，改变取得数据及计算部分和的过程。这两类配置可以组合使用。</p>
 
 
 
