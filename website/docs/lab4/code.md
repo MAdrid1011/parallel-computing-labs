@@ -1,80 +1,144 @@
 # Lab4 核心代码讲解
 
-Lab4 继续计算 `C = A × B`，但每个 MPI 进程只保存一部分矩阵。A 的本地行决定了本进程负责哪些输出，而这些行的列索引决定了它需要哪些 B 行。围绕这一依赖关系，可以把实现分为数据划分、数据交换和本地计算三个部分。
+Lab4 继续计算稀疏矩阵乘法。与 Lab1 的线程共同读取 B 不同，MPI 的每个进程有自己的内存，需要通过消息取得其他进程保存的数据。这里有两个相互联系的决定：每个进程负责计算 C 的哪些行，以及为了计算这些行，需要获得 B 的哪些行。
 
-## 1. 每个进程负责哪些行？
+程序在 `src/main.cpp` 中初始化 MPI，各进程进入 `benchmark` 后沿着同一条流程执行：
 
-`src/distribution.cpp` 中的 `make_distribution` 计算所有进程的行边界，再取出当前 rank 对应的区间。
+```text
+make_distribution 确定归属
+    → 生成本进程的 A 行和 B 行
+    → prepare_workspace 准备本地行块与所需数据空间
+    → 所选 kernel 取得 B 并完成乘法
+    → 得到本进程负责的 C 行
+```
 
-{{SOURCE {"path": "Lab4/src/distribution.cpp", "start": "    std::vector<std::size_t> prefix", "end": "    d.b_begin = d.b_offsets[d.rank]; d.b_end = d.b_offsets[d.rank + 1];"}}}
+C 的全部行由各进程的这些本地结果共同组成，计算完成后仍按行分布保存在各进程中。下面先确定数据归属，再看不同 kernel 怎样完成这条流程。
 
-`a_offsets[p]` 是进程 p 所负责的 A 行段的起点，右端是 `a_offsets[p+1]`，同一进程也负责 C 的对应行。`partition=rows` 按行数均分；`partition=nnz` 先构造非零数前缀和，再用 `lower_bound` 寻找接近各份目标工作量的行边界。它不会拆开一行，因此非零数也不保证完全相等。
+## 1. 把同一个乘法分给两个进程
 
-B 按行数均分，与 A 选择哪种划分方式无关。`b_counts` 计算每个进程持有多少个 B 元素，`b_displacements` 给出这些元素在完整 B 中的起始偏移。两者都以 `MPI_DOUBLE` 元素为单位，不是字节数。
+沿用 Lab1 的小矩阵：
 
-接下来的准备过程使用这些全局行号生成本地矩阵：
+```text
+A = [ 2  0  0 ]       B = [ 1   2   3   4 ]
+    [ 0  3  0 ]           [ 5   6   7   8 ]
+    [ 4  0  5 ]           [ 9  10  11  12 ]
+```
 
-{{SOURCE {"path": "Lab4/src/benchmark.cpp", "start": "    const auto d = make_distribution", "end": "    auto workspace = prepare_workspace(cfg, d, a, b, comm);"}}}
+现在使用两个进程，编号分别是 rank 0 和 rank 1。A 三行的非零数为 1、1、2，按非零数划分时，可以把前两行交给 rank 0，最后一行交给 rank 1：
 
-本实验能根据全局坐标和种子重复生成相同数据，因此各进程直接生成自己的 A、B 行，没有先由 rank 0 保存整份 A 再分发。生成后的本地 A 用从 0 开始的行号存储，但其列索引仍指向全局 B 行。
+| 进程 | 保存的 A 行 | 负责的 C 行 | 本来持有的 B 行 |
+|---|---|---|---|
+| rank 0 | 第 0、1 行 | 第 0、1 行 | 第 0 行 |
+| rank 1 | 第 2 行 | 第 2 行 | 第 1、2 行 |
 
-## 2. 先获得完整 B，再计算本地 C
+B 按行数划分。由于本例 B 有 3 行，代码使用的边界公式得到 rank 0 持有第 0 行、rank 1 持有第 1、2 行。
 
-Broadcast 的 rank 0 在准备阶段生成完整 B，其他进程为完整 B 分配空间。运行时先广播，再调用本地乘法：
+负责某个 C 行，并不意味着所需 B 数据也在这个进程。例如 rank 0 要计算 `C[1,:] = 3 × B[1,:]`，但 B 的第 1 行在 rank 1。进程之间的通信就用来补齐这种计算依赖。
 
-{{SOURCE {"path": "Lab4/src/spmm_full.cpp", "start": "void broadcast(", "end": "    stat.compute_s = MPI_Wtime() - start;"}}}
+## 2. partition 只决定 A 和 C 怎样分行
 
-`MPI_Bcast` 返回后，每个进程都有相同的 `w.full_b`。本地 A 的列索引可以直接索引它，计算结果只写入本地 C。
+设置 `partition=rows` 时，程序根据行数划分 A。对这个 3 行的例子，rank 0 得到第 0 行，rank 1 得到第 1、2 行。
 
-Allgather 的出发点不同：各进程原本持有不同的 B 行，通过一次集合通信拼出完整 B。
+设置 `partition=nnz` 时，根据累计非零数寻找行边界。本例共有 4 个非零元素，两个进程各承担约 2 个，因此 rank 0 得到前两行，rank 1 得到最后一行。两种划分都保留完整的行。
 
-{{SOURCE {"path": "Lab4/src/spmm_full.cpp", "start": "void allgather(", "end": "    stat.compute_s = MPI_Wtime() - start;"}}}
+{{SOURCE {"path": "Lab4/src/distribution.cpp", "start": "    for (int p = 0; p <= d.ranks;", "end": "        d.b_offsets[p] = cfg.k * p / d.ranks;"}}}
 
-`b_counts` 说明每份数据有多长，`b_displacements` 说明它应该放到完整 B 的哪里。两个版本在通信后使用同一个 `multiply_tiled` 内核，因此比较时主要关注获得 B 的方式及其开销。
+`a_offsets` 保存 A 的分界位置，使用 rows 或 nnz 对应的规则；`b_offsets` 则始终根据 B 的行数划分。`prefix` 是 A 的非零数前缀和，用来找到累计工作量接近各份目标的位置。
 
-## 3. Halo 只收集实际引用的 B 行
+下面继续使用 `partition=nnz` 的分配。Broadcast、Allgather、Halo 和 Overlap 都可以在这个分配上运行，它们改变的是如何取得 B，而不是重新决定由谁计算 C 的某一行。
 
-如果本地 A 只引用少量不同的列，收集完整 B 就会传来许多用不到的数据。`src/communication_plan.cpp` 先从本地 A 的列索引构造需求集合：
+## 3. Broadcast 与 Allgather 都让各进程获得完整 B
 
-{{SOURCE {"path": "Lab4/src/communication_plan.cpp", "start": "    auto columns = a.col_idx;", "end": "    const auto receive_offsets = displacements(receive_rows);"}}}
+Broadcast 由 rank 0 准备完整 B，再把它广播给所有进程：
 
-排序和去重使一个 B 行只请求一次，即使本地 A 中有很多非零元素引用它。落在 `[b_begin,b_end)` 的行已经在本进程，其他行则根据 `b_offsets` 找到所属进程，并累计需要向它接收的行数。
+{{SOURCE {"path": "Lab4/src/spmm_full.cpp", "start": "    MPI_Bcast(", "end": "    MPI_Bcast("}}}
 
-随后，程序先交换“需要哪些行”的编号，让每个进程知道应该发送自己的哪些行。收到的实际 B 数据保存在 `needed_b` 中：前部放本地所需行，后部放远程所需行。由于行号已经压缩，计划中的 `slot` 会把 A 的全局列号改写为 `needed_b` 中的槽号。
+本例广播后，rank 0 与 rank 1 都有 B 的全部 3 行。rank 0 用它们计算 C 的前两行，rank 1 用它们计算最后一行。
 
-例如，本进程只需要全局 B 的第 1、7、9 行，且第 1 行属于自己，那么 `needed_b` 可以依次保存这三行。相应的 A 列号会从 1、7、9 改成 0、1、2，原有乘法内核因而仍能通过列索引找到正确数据。
+Allgather 则让每个进程贡献原本持有的 B 行，一起拼出完整 B：
 
-准备好计划后，每次 Halo 运行执行：
+```text
+rank 0 提供 B 第 0 行 ──┐
+                       ├─ 每个进程得到 B 的第 0、1、2 行
+rank 1 提供 B 第 1、2 行 ┘
+```
 
-{{SOURCE {"path": "Lab4/src/spmm_halo.cpp", "start": "    pack_send_rows", "end": "    stat.compute_s = MPI_Wtime() - start;"}}}
+{{SOURCE {"path": "Lab4/src/spmm_full.cpp", "start": "    MPI_Allgatherv(", "end": "                   w.full_b.values.data(), d.b_counts.data(), d.b_displacements.data(), MPI_DOUBLE, comm);"}}}
 
-`pack_send_rows` 复制当前所需的本地 B 行，并按发送计划打包其他进程请求的行。`MPI_Alltoallv` 允许各进程之间交换不同长度的数据；接收指针跳过本地前缀，将远程行直接写入预留的后部区域。通信完成后，`h.all` 使用改写后的列索引完成乘法。
+`b_counts` 说明各进程提供多少个元素，`b_displacements` 说明各份数据放在完整 B 的哪里。获得完整 B 后，两种实现都调用同一个 `multiply_tiled` 完成本地乘法。
 
-请求行号的交换与索引改写属于准备阶段，计入 `setup_s`；每轮实际数据的打包、交换和计算计入 `elapsed_s`。因此，`receive_bytes` 描述的是 B 数据的逻辑字节数，没有把计划元数据或 MPI 协议开销算进去。
+它们是两种获得完整 B 的方式：Broadcast 从 rank 0 发出整份数据，Allgather 从各进程收集各自的数据片段。
 
-## 4. Overlap 在等远程行时计算什么？
+## 4. Halo 根据 A 的非零列号，只交换需要的 B 行
 
-准备阶段还把 A 的非零元素分成 `h.local` 和 `h.remote`：前者只引用本地 B，后者引用需要接收的远程 B。两部分的行数相同，可以分别计算并累加到同一个 C。
+本例中，rank 0 的 A 行只引用 B 的第 0、1 行，rank 1 的 A 行只引用 B 的第 0、2 行。因此可以只补齐缺少的部分：
 
-{{SOURCE {"path": "Lab4/src/spmm_overlap.cpp", "start": "    MPI_Request request;", "end": "        stat.compute_s += MPI_Wtime() - start;"}}}
+| 进程 | 计算所需的 B 行 | 已经在自己这里 | 需要向其他进程取得 |
+|---|---|---|---|
+| rank 0 | 0、1 | 0 | 向 rank 1 取得第 1 行 |
+| rank 1 | 0、2 | 2 | 向 rank 0 取得第 0 行 |
 
-这里的先后关系决定了正确性：
+Halo 就使用这个规则。A 的列号 k 告诉程序需要 B 的第 k 行；同一行 B 被引用多次时，只需要请求一份。
 
-1. `MPI_Ialltoallv` 发起交换后返回一个 request，通信仍可能在进行。
-2. `multiply_tiled(h.local, ...)` 只读取 `needed_b` 的本地前缀；通信接收只写远程后缀，两者的访问范围不冲突。
-3. `MPI_Wait` 确认请求完成，此后才能读取远程部分。
-4. 最后的 `true` 表示把远程贡献加到已有 C，而不是覆盖此前算出的本地贡献。
+{{SOURCE {"path": "Lab4/src/communication_plan.cpp", "start": "    auto columns = a.col_idx;", "end": "    columns.erase(std::unique(columns.begin(), columns.end()), columns.end());"}}}
 
-“累加还是覆盖”在微内核的输出语句中实现：
+排序和去重后，程序区分已有的行和需要请求的行，并交换请求列表。正式搬运数据时，用 `MPI_Alltoallv` 按计划发送所需 B 行：
 
-{{SOURCE {"path": "Lab4/src/spmm_tiled.cpp", "start": "    auto* output = c.values.data()", "end": "        output[lane] = sums[lane] + (add ? output[lane] : 0.0);"}}}
+{{SOURCE {"path": "Lab4/src/spmm_halo.cpp", "start": "    MPI_Alltoallv(", "end": "                  h.receive_counts.data(), h.receive_displacements.data(), MPI_DOUBLE, comm);"}}}
 
-如果省略最后的累加，本地部分就会丢失。另一方面，使用非阻塞接口只创造了重叠的机会：实际收益取决于本地可计算工作量，以及 MPI 实现能否在计算期间推进通信。`wait_s` 记录到达 `MPI_Wait` 后还要等多久，不能仅凭调用了 `MPI_Ialltoallv` 就认定通信已被隐藏。
+收集到的行保存在紧凑矩阵 `needed_b` 中。本例 rank 1 已有 B 第 2 行，将它放在槽 0，收到的 B 第 0 行放在槽 1。A 原来的列号 0、2 也相应改成槽号 1、0，原有乘法循环就能在这份较小的矩阵中找到正确数据。
 
-## 5. 总时间为什么取最慢进程？
+Halo 先等所需的行到齐，再完成本地乘法。与收集完整 B 相比，它改变了保存和交换的数据范围，结果 C 保持相同。
 
-{{SOURCE {"path": "Lab4/src/benchmark.cpp", "start": "        stat.rank_elapsed_s =", "end": "        MPI_Reduce(&stat.rank_elapsed_s, &elapsed, 1, MPI_DOUBLE, MPI_MAX, 0, comm);"}}}
+## 5. Overlap 先计算已经具备数据的部分
 
-每个进程记录自己完成本轮交换与计算的耗时，再用 `MPI_MAX` 汇总。整个结果需要所有进程共同完成，所以一个进程提前结束，并不能让本轮计算提前结束。
+Overlap 使用与 Halo 相同的需求列表，但把计算分成已有数据和远程数据两部分。对 rank 1 的输出行，有：
 
-按照[操作步骤](run.md)比较时，可以先用 `nnz` 与 `rank_elapsed_s` 看 A 的工作量是否均衡，再用 `local_nnz`、`remote_nnz` 和 `receive_bytes` 看数据依赖。最后比较 Halo 与 Overlap 的 `elapsed_s` 和 `wait_s`，判断本地计算是否提供了足够的重叠空间。汇总的各阶段最大值可能来自不同 rank，不能直接相加还原总时间。
+```text
+C 的第 2 行 = 4 × B 的第 0 行 + 5 × B 的第 2 行
+                需要接收             本地已有
+```
+
+因此 rank 1 可以发起交换后，先用已有的 B 第 2 行计算一份部分结果：
+
+```text
+先计算本地贡献：5 × [9,10,11,12] = [45,50,55,60]
+收到远程行以后：4 × [1, 2, 3, 4] = [ 4, 8,12,16]
+两份贡献相加：                   [49,58,67,76]
+```
+
+源码先用非阻塞接口发起交换：
+
+{{SOURCE {"path": "Lab4/src/spmm_overlap.cpp", "start": "    MPI_Ialltoallv(", "end": "                   h.receive_counts.data(), h.receive_displacements.data(), MPI_DOUBLE, comm, &request);"}}}
+
+这个调用返回后，数据可能还在传输，程序可以继续执行其他计算。`h.local` 保存只引用本地 B 行的 A 元素，用来先计算本地贡献：
+
+{{SOURCE {"path": "Lab4/src/spmm_overlap.cpp", "start": "    multiply_tiled(h.local,", "end": "    multiply_tiled(h.local,"}}}
+
+这里的 local 和 remote 根据 **B 的行位于哪个进程**来区分。同一行 A 可以同时含有两种元素，就像本例 A 第 2 行中的 4 和 5。
+
+读取远程数据前，`MPI_Wait` 确认接收完成，随后把 `h.remote` 的贡献加到已有结果：
+
+{{SOURCE {"path": "Lab4/src/spmm_overlap.cpp", "start": "    MPI_Wait(&request,", "end": "    MPI_Wait(&request,"}}}
+
+{{SOURCE {"path": "Lab4/src/spmm_overlap.cpp", "start": "        multiply_tiled(h.remote,", "end": "        multiply_tiled(h.remote,"}}}
+
+最后一个参数 `true` 表示保留原有 C，再加本次部分和。输出语句为：
+
+{{SOURCE {"path": "Lab4/src/spmm_tiled.cpp", "start": "        output[lane] = sums[lane]", "end": "        output[lane] = sums[lane]"}}}
+
+这一步把 `[45,50,55,60]` 与 `[4,8,12,16]` 合在一起。Halo 与 Overlap 请求相同的远程行；Overlap 进一步安排了这些行到达前可以完成的计算。
+
+## 6. 进程划分与本地分块的组合
+
+| 配置项 | 决定什么 | 在本例中的含义 |
+|---|---|---|
+| `ranks` | 参加计算的 MPI 进程数 | 使用 rank 0、rank 1 两个进程 |
+| `partition` | 每个进程负责哪些 A 行和 C 行 | nnz 划分使前两行和最后一行分属两个进程 |
+| `kernel` | 怎样获得 B、怎样安排本地与远程贡献 | 选择 Broadcast、Allgather、Halo 或 Overlap |
+| `block-nnz` | 一个进程内部怎样把自己的 A 行组成行块 | 分组本地行，不会再创建 MPI 进程 |
+| `tile` | 本地乘法一次处理多少输出列 | tile=2 时，4 列分为前两列、后两列 |
+
+可以把整个过程看成两层：先决定各进程拥有哪些输出行，再在每个进程内部按行块和列块组织乘法。这里的本地内核按循环依次处理这些块，Lab4 没有再为这些块启动 OpenMP 线程。
+
+改变 partition 会改变进程的工作和所需 B 行；在相同 partition 上改变通信内核，则保留输出行的归属，改变取得数据及计算部分和的过程。这两类配置可以组合使用。

@@ -4,6 +4,7 @@ from io import BytesIO
 import json
 from pathlib import Path
 import re
+from textwrap import dedent
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from mkdocs.structure.files import File
@@ -21,9 +22,14 @@ def source_excerpt(match):
         raise ValueError(f"Invalid source excerpt: {spec['path']}")
     lines = path.read_text(encoding="utf-8").splitlines()
     begin, end = 0, len(lines)
+    if "after" in spec:
+        anchors = [i for i, line in enumerate(lines) if spec["after"] in line]
+        if len(anchors) != 1:
+            raise ValueError(f"Source context must match once: {spec}")
+        begin = anchors[0] + 1
     if "start" in spec:
-        candidates = [i for i, line in enumerate(lines) if spec["start"] in line]
-        if len(candidates) != 1:
+        candidates = [i for i in range(begin, len(lines)) if spec["start"] in lines[i]]
+        if not candidates or ("after" not in spec and len(candidates) != 1):
             raise ValueError(f"Source start must match once: {spec}")
         begin = candidates[0]
     if "end" in spec:
@@ -35,7 +41,7 @@ def source_excerpt(match):
     language = {".cpp": "cpp", ".hpp": "cpp", ".sv": "systemverilog", ".py": "python"}[path.suffix]
     url = f"https://github.com/MAdrid1011/parallel-computing-labs/blob/main/{relative}#L{begin + 1}-L{end}"
     label = f"源码：[{relative} · L{begin + 1}–L{end}]({url})（节选）"
-    code = "\n".join(lines[begin:end])
+    code = dedent("\n".join(lines[begin:end]))
     return f'{label}\n\n```{language} linenums="{begin + 1}"\n{code}\n```'
 
 

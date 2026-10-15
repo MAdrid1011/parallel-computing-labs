@@ -1,68 +1,137 @@
 # Lab3 核心代码讲解
 
-直方图把每个输入值映射到一个桶：输入值 bucket 出现一次，`counts[bucket]` 就增加 1。输入可以分给不同线程读取，输出桶却可能被多个线程同时更新。五种实现的差别，正是怎样协调这些写入。
+直方图统计每种数值出现了多少次。例如，输入中出现一次 2，就把第 2 个桶的计数加一。这个计算可以由多个线程共同完成，但不同线程读到相同数值时，会一起修改同一个桶。Lab3 的几个版本围绕这一处共享写入，采用不同的处理方式。
 
-## 1. 串行计数为什么不能直接加上并行循环？
+`src/main.cpp` 读取配置后进入 `benchmark`，由 `generate_input` 准备输入，随后准备清零的 counts 和所需工作区。一次运行选择一个计数函数，得到这一份输入的完整直方图：
 
-{{SOURCE {"path": "Lab3/src/histogram_serial.cpp", "start": "void serial(", "end": "    stat.compute_s = lab::now() - begin;"}}}
+```text
+生成 input → 准备 counts 和工作区 → 选择计数函数 → 得到 counts
+                                    ├─ serial
+                                    ├─ critical
+                                    ├─ atomic
+                                    ├─ locks
+                                    └─ private_counts（局部计数后合并）
+```
 
-单线程中，`++counts[bucket]` 正常完成计数。多个线程共享 counts 时，即使它们读取输入的不同位置，也可能读到同一个 bucket。
+## 1. 输入序列与输出计数
 
-例如，两个线程都读取到旧计数 5，各自算出 6 并写回，就会丢失一次更新。普通 `++` 在这里没有提供跨线程同步保证；需要下面的保护方式，或改变计数的归属。
+设输入有 8 个数，数值都在 0～3 之间：
 
-## 2. Critical 与 Atomic：保护范围有什么不同？
+```text
+输入：[0, 1, 0, 2, 0, 3, 1, 0]
 
-Critical 实现的核心循环是：
+桶号：   0  1  2  3
+计数： [ 4, 2, 1, 1 ]
+```
 
-{{SOURCE {"path": "Lab3/src/histogram_critical.cpp", "start": "        #pragma omp for", "end": "            ++local.updates;"}}}
+这里 `n=8` 表示输入长度，`bins=4` 表示有 4 个输出桶。桶号从 0 开始，`counts[2]` 就是数值 2 出现的次数。
 
-`critical(histogram_update)` 使用同一个具名临界区保护更新。无论 bucket 是否相同，同一时刻只能有一个线程进入这里。`local.updates` 是线程自己的统计数据，放在临界区外即可。
+串行实现从左到右读取输入，每次把相应的桶加一：
 
-Atomic 把保护缩小到一次指定的内存更新：
+{{SOURCE {"path": "Lab3/src/histogram_serial.cpp", "start": "    for (auto bucket : input)", "end": "    for (auto bucket : input)"}}}
 
-{{SOURCE {"path": "Lab3/src/histogram_atomic.cpp", "start": "        #pragma omp for", "end": "            ++local.updates;"}}}
+如果使用两个线程，可以各自处理一半输入：
 
-`atomic update` 保证这次 `counts[bucket] += 1` 不会因为并发更新而丢失计数。它没有把其他语句一起保护起来。多个线程仍会争用热点桶及相关缓存行，因此 Atomic 也可能在 `hotspot` 输入下变慢。
+```text
+线程 0 读取：[0, 1, 0, 2]
+线程 1 读取：[0, 3, 1, 0]
+```
 
-输入分布因而会影响两种方式的表现。固定 n、桶数与线程数，在 `uniform` 和 `hotspot` 下比较时，热点输入让更多更新集中到同一个位置，可以帮助分析竞争对运行时间的影响。
+两份输入是分开的，但两个线程都可能更新桶 0。普通的加一可以分为读旧值、加一、写回三步。如果桶 0 原先是 0，两个线程都先读到 0，再各自写回 1，就会少算一次。下面的实现都要保证这两个更新能正确保留下来。
 
-## 3. 分段锁：桶号决定拿哪把锁
+## 2. Critical 与 Atomic 都更新同一份输出
 
-{{SOURCE {"path": "Lab3/src/histogram_locks.cpp", "start": "        #pragma omp for", "end": "            ++local.updates;"}}}
+Critical 让所有线程共用一个入口，每次修改 counts 都要进入这个临界区：
 
-`bucket % stripes` 把桶映射到一组锁。比如 stripes=16 时，桶 0 与桶 16 共用锁 0，桶 1 使用锁 1。写 counts 前拿锁，写完后释放，所有线程对同一桶必定选择同一把锁。
+{{SOURCE {"path": "Lab3/src/histogram_critical.cpp", "start": "            const auto bucket =", "end": "            { ++counts[bucket]; }"}}}
 
-stripes=1 时，全部更新都争用一把锁；锁数增多后，不同桶有机会同时更新。不过，同一热点桶始终只受一把锁保护，增加锁数不能把桶 0 的更新拆开。锁本身的管理和缓存访问也需要时间。
+例如，线程 0 更新桶 0 时，线程 1 要等它离开临界区，才能执行自己的更新。即使线程 1 想更新桶 3，也要经过同一个入口。
 
-锁由 `src/workspace.cpp` 在工作区构造时初始化，并在析构时销毁，这些初始化工作不放在每次计数的内循环中。
+Atomic 同样保留一份共享 counts，不过直接保证单次加一完整完成：
 
-## 4. Private：把共享写入改成每线程独占
+{{SOURCE {"path": "Lab3/src/histogram_atomic.cpp", "start": "            const auto bucket =", "end": "            counts[bucket] += 1;"}}}
 
-{{SOURCE {"path": "Lab3/src/histogram_private.cpp", "start": "        auto* local_counts =", "end": "        const double merge_begin = lab::now();"}}}
+两个线程同时给桶 0 加一时，两次原子更新都会生效，最终从 0 变成 2。这里保护的是紧随 `atomic update` 的那次加法。
 
-`tid*stride` 为当前线程定位自己的桶数组。所有线程可以同时执行 `++local_counts[input[i]]`，因为它们写的是不同数组，即使 input[i] 相同也不冲突。
+Critical 与 Atomic 是两种可选实现。选择 `--kernel critical` 时使用前一种，选择 `--kernel atomic` 时使用后一种。程序不会先完成一遍 Critical，再在它的结果上执行 Atomic。
 
-`workspace.cpp` 把 stride 向 16 个计数的倍数取整后额外留出 16 个计数，给不同线程的区域留出间隔。这是减少相邻私有区互相影响的布局措施，不应据此假定所有机器都采用某个固定缓存行大小。
+## 3. Locks 让不同桶使用不同的锁
 
-这里的屏障不能省略：开始合并之前，需要保证所有线程都已完成自己的计数。`nowait` 先让线程记录 `counted`，随后显式屏障建立这个先后关系。
+Locks 也更新共享 counts，但先根据桶号选择锁。假设 `bins=4`、`stripes=2`，就有下面的对应关系：
 
-## 5. 合并时为什么也不需要锁？
+```text
+桶 0 ─┐
+桶 2 ─┴─ 使用锁 0
 
-{{SOURCE {"path": "Lab3/src/histogram_private.cpp", "start": "        const double merge_begin = lab::now();", "end": "        const double merged = lab::now();"}}}
+桶 1 ─┐
+桶 3 ─┴─ 使用锁 1
+```
 
-这段合并循环按输出桶分工：一个 bucket 只交给一个线程，它读取所有线程在这个桶上的局部计数，求和后写入一次全局 counts。此时其他线程已经结束局部写入，输出桶也互不重叠，所以没有共享更新冲突。
+映射规则是 `bucket % stripes`。更新桶 0 与桶 2 的线程需要同一把锁；更新桶 0 与桶 1 则可以使用不同锁。代码先获取所选的锁，完成加一后再释放：
 
-假设 2 个线程、4 个桶，局部结果分别为 `[2,1,0,1]` 与 `[1,0,3,0]`，合并后就是 `[3,1,3,1]`。外层 bucket 确定一个输出位置，内层 t 则遍历各线程在该位置上的计数。
+{{SOURCE {"path": "Lab3/src/histogram_locks.cpp", "start": "            const auto bucket =", "end": "            omp_unset_lock(&lock);"}}}
 
-Private 用额外存储和合并工作换掉逐元素同步：局部计数空间随“线程数×stride”增长，合并要读取“线程数×桶数”个计数。n 很小时，这些开销可能占据更大比例。
+把 stripes 改成 4，四个桶就分别使用四把锁，输出仍是 `[4,2,1,1]`。把 stripes 改成 1，所有桶都会映射到锁 0。**锁数决定哪些更新需要相互等待，桶数决定输出有多少种计数。**
 
-!!! note "怎样读 Private 的时间字段？"
-    `merge_s` 单列合并阶段，且已经包含在该线程的 `compute_s` 中，不能再加一次。`wait_s` 记录计数后与合并后的屏障等待；它不测量 Critical 或锁内部的等待，那些时间已包含在内核执行过程中。
+同一个桶始终映射到同一把锁。因此，输入中如果大部分数值都是 0，即使准备了很多把锁，这些输入仍然集中更新桶 0。
 
-## 6. 正确性检查与性能分析
+## 4. Private 先保存各线程自己的计数
 
-`src/benchmark.cpp` 每轮在计时前把全局 counts 和私有计数清零，计时内包括实际计数与 Private 的合并。计时后再执行 `--verify` 的逐桶对照。
+Private 改变了输出的保存方式：先给每个线程一份完整的 4 桶计数，各自处理自己的输入。
 
-所有桶的和应该等于输入数 n，但这个条件不足以证明每个桶都对。例如 `[4,2]` 与 `[3,3]` 总和相同，分布却不同，因此正确性检查会逐桶比较。
+```text
+线程 0 的输入：[0, 1, 0, 2]  →  私有计数 [2, 1, 1, 0]
+线程 1 的输入：[0, 3, 1, 0]  →  私有计数 [2, 1, 0, 1]
+```
 
-按照[操作步骤](run.md)固定输入，只改变同步方式或锁数，可以将 `elapsed_s` 与实现中的共享更新、屏障等待和合并工作联系起来。是否用了锁只是其中一个因素，线程之间实际争用哪些位置、额外工作占多少，也会影响最终表现。
+两个线程都可以更新自己的桶 0，因为这两个桶存放在不同位置。代码通过线程编号找到自己那一份数组：
+
+{{SOURCE {"path": "Lab3/src/histogram_private.cpp", "start": "        auto* local_counts =", "end": "        auto* local_counts ="}}}
+
+`stride` 表示相邻两份私有数组起点的距离。线程 0 从数组开头使用自己的区域，线程 1 从下一个区域开始。输入循环因此直接更新私有计数：
+
+{{SOURCE {"path": "Lab3/src/histogram_private.cpp", "start": "        for (std::size_t i =", "end": "            ++local_counts[input[i]];"}}}
+
+每个线程拥有所有桶，只读取一部分输入。它们都完成后，程序把相同桶号的计数相加：
+
+```text
+桶 0：2 + 2 = 4
+桶 1：1 + 1 = 2
+桶 2：1 + 0 = 1
+桶 3：0 + 1 = 1
+
+得到最终 counts = [4, 2, 1, 1]
+```
+
+合并循环按最终输出桶分工，一个桶由一个合并任务负责：
+
+{{SOURCE {"path": "Lab3/src/histogram_private.cpp", "start": "        for (std::size_t bucket =", "end": "            counts[bucket] = total;"}}}
+
+外层 bucket 选定输出桶，内层 t 遍历所有线程在这个桶上的计数。开始合并前的屏障保证各线程已经完成私有写入；合并时，各任务又分别写不同的最终桶。
+
+## 5. 几种配置之间的关系
+
+| 实现 | 计数过程中写到哪里 | 怎样得到最终结果 |
+|---|---|---|
+| Serial | 一份 counts，由单线程更新 | 逐个输入加一 |
+| Critical | 多线程共用一份 counts | 每次加一进入同一个临界区 |
+| Atomic | 多线程共用一份 counts | 每次加一使用原子更新 |
+| Locks | 多线程共用一份 counts | 根据桶号选锁，再加一 |
+| Private | 每线程有一份完整的桶数组 | 各自计数，再逐桶相加 |
+
+`--kernel` 在这些实现之间选择。Critical、Atomic 和 Locks 是共享更新的几种替代方案；Private 则把计算分为“各自计数”和“合并”两步。
+
+对于刚才的例子，各参数控制的内容如下：
+
+| 参数 | 取值示例 | 对计算的影响 |
+|---|---|---|
+| `n` | 8 | 要读取 8 个输入值 |
+| `bins` | 4 | 输出为 4 个桶，允许的输入桶号为 0～3 |
+| `threads` | 2 | 由两个线程分担输入；Private 准备两份私有计数 |
+| `stripes` | 2 | Locks 使用两把锁，按余数映射；其他内核不使用这些锁 |
+| `distribution` | `uniform` 或 `hotspot` | 改变生成的输入值集中在哪些桶 |
+| `hot-percent` | 90 | hotspot 生成输入时，大约 90% 的位置定向选择桶 0，其余位置在全部桶中选取 |
+
+hotspot 中，其余随机选取的位置也可能取到 0，因此最终桶 0 的占比可能高于 hot-percent。
+
+改变线程数、锁数或内核时，同一份输入仍应得到同一个直方图。改变 bins 或输入分布，则改变了要统计的数据及其输出含义。脚本中 `Lock1`、`Lock16` 等名称表示同一个 Locks 内核使用不同锁数，并没有在 Critical 或 Atomic 上再叠加一层锁。

@@ -38,7 +38,7 @@ python3 -m mkdocs serve --dev-addr 127.0.0.1:8000
 {{SOURCE {"path": "Lab1/src/benchmark.cpp", "start": "    omp_set_dynamic(0);", "end": "    std::vector<double> times, checksums;"}}}
 ```
 
-`path` 相对于仓库根目录。省略 start/end 时展示完整文件；指定时包含起止行，start 必须在文件中唯一，end 取其后首次匹配。构建会生成原文件行号与 GitHub 源码链接，缺失路径或定位文本会使构建失败。修改实现后应同时复核相邻讲解是否仍然准确。
+`path` 相对于仓库根目录。省略 start/end 时展示完整文件；指定时包含起止行，start 默认必须在文件中唯一，end 取其后首次匹配。可选的 after 先定位一处唯一的上下文，再取其后首个 start，用于区分同一文件中相似的内核循环。片段会移除共同的前导缩进。构建会生成原文件行号与 GitHub 源码链接，缺失路径或定位文本会使构建失败。修改实现后应同时复核相邻讲解是否仍然准确。
 
 源码下载来自当前 Lab 文件，包含源码、构建配置、Python 脚本及其依赖和第三方文件；排除 `build/`、`results/`、`.venv/`、波形与 Python 缓存。下载文件在构建时生成，无需额外维护压缩包。
 
