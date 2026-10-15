@@ -34,4 +34,5 @@ counts[v] += 1;
 
 [阅读同步教程](synchronization.md){ .md-button .md-button--primary }
 [操作步骤](run.md){ .md-button }
+[核心代码讲解](code.md){ .md-button }
 [下载 Lab3 源码](../downloads/Lab3.zip){ .md-button }

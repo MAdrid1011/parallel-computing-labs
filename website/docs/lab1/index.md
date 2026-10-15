@@ -50,4 +50,5 @@ C[i,j] = Σ A[i,k] × B[k,j]
 
 [阅读 CSR 教程](csr.md){ .md-button .md-button--primary }
 [操作步骤](run.md){ .md-button }
+[核心代码讲解](code.md){ .md-button }
 [下载 Lab1 源码](../downloads/Lab1.zip){ .md-button }

@@ -33,4 +33,5 @@ Lab1 和 Lab4 利用 A 的稀疏性，只处理非零元素。本实验的 A、B
 
 [阅读架构教程](architecture.md){ .md-button .md-button--primary }
 [操作步骤](run.md){ .md-button }
+[核心代码讲解](code.md){ .md-button }
 [下载 Lab5 源码](../downloads/Lab5.zip){ .md-button }

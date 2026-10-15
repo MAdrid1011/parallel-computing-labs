@@ -34,4 +34,5 @@ B[j,i] = A[i,j]
 
 [阅读局部性教程](locality.md){ .md-button .md-button--primary }
 [操作步骤](run.md){ .md-button }
+[核心代码讲解](code.md){ .md-button }
 [下载 Lab2 源码](../downloads/Lab2.zip){ .md-button }

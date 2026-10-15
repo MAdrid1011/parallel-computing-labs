@@ -34,4 +34,5 @@ OpenMP 线程可以读取同一份 B。MPI 程序中的每个进程有自己的�
 
 [先认识 MPI](mpi.md){ .md-button .md-button--primary }
 [操作步骤](run.md){ .md-button }
+[核心代码讲解](code.md){ .md-button }
 [下载 Lab4 源码](../downloads/Lab4.zip){ .md-button }

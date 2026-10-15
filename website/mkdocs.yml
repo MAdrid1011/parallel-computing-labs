@@ -11,10 +11,21 @@ watch:
   - overrides
   - search_dictionary.txt
   - ../Lab1/README.md
+  - ../Lab1/src
+  - ../Lab1/include
   - ../Lab2/README.md
+  - ../Lab2/src
+  - ../Lab2/include
   - ../Lab3/README.md
+  - ../Lab3/src
+  - ../Lab3/include
   - ../Lab4/README.md
+  - ../Lab4/src
+  - ../Lab4/include
   - ../Lab5/README.md
+  - ../Lab5/src
+  - ../Lab5/include
+  - ../Lab5/rtl
 
 theme:
   name: material
@@ -59,28 +70,33 @@ nav:
       - 稀疏矩阵与 CSR: lab1/csr.md
       - 任务划分与分块计算: lab1/parallel.md
     - 操作步骤: lab1/run.md
+    - 核心代码讲解: lab1/code.md
   - Lab2:
     - 实验介绍: lab2/index.md
     - 实验教程:
       - 矩阵转置与局部性: lab2/locality.md
     - 操作步骤: lab2/run.md
+    - 核心代码讲解: lab2/code.md
   - Lab3:
     - 实验介绍: lab3/index.md
     - 实验教程:
       - 共享计数与同步: lab3/synchronization.md
     - 操作步骤: lab3/run.md
+    - 核心代码讲解: lab3/code.md
   - Lab4:
     - 实验介绍: lab4/index.md
     - 实验教程:
       - 从线程到进程: lab4/mpi.md
       - 按需通信与计算重叠: lab4/communication.md
     - 操作步骤: lab4/run.md
+    - 核心代码讲解: lab4/code.md
   - Lab5:
     - 实验介绍: lab5/index.md
     - 实验教程:
       - SPM 与脉动阵列: lab5/architecture.md
       - 分块、双缓冲与周期: lab5/tiling.md
     - 操作步骤: lab5/run.md
+    - 核心代码讲解: lab5/code.md
   - FAQ:
     - 常见问题: faq.md
     - 术语速查: glossary.md
